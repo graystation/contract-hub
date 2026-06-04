@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Contract extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'project_id',
         'contract_number',
@@ -17,10 +18,17 @@ class Contract extends Model
         'signed_at',
         'status',
         'notes',
+        'sign_token',
+        'sign_token_expires_at',
+        'signer_name',
+        'signer_email',
+        'signer_ip_address',
+        'signer_user_agent',
     ];
 
     protected $casts = [
-        'signed_at' => 'date',
+        'signed_at'             => 'datetime',
+        'sign_token_expires_at' => 'datetime',
     ];
 
     public const STATUSES = ['draft', 'sent', 'signed', 'cancelled'];

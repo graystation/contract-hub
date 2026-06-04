@@ -4,6 +4,8 @@ $actionLabels = [
     'contract_file_hash_verified_matched'        => 'ハッシュ検証（一致）',
     'contract_file_hash_verified_mismatched'     => 'ハッシュ検証（不一致）',
     'contract_file_hash_verified_missing'        => 'ハッシュ検証（ファイルなし）',
+    'contract_sign_url_generated'               => '同意URL発行',
+    'contract_signed_by_external_user'          => '電子同意完了',
 ];
 @endphp
 
@@ -24,6 +26,15 @@ $actionLabels = [
                 </h2>
             </div>
             <div class="flex items-center space-x-2">
+                @if ($contract->status !== 'signed' && $contract->status !== 'cancelled')
+                    <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
+                        @csrf
+                        <button type="submit"
+                                class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                            同意URLを発行
+                        </button>
+                    </form>
+                @endif
                 <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
                     @csrf
                     <button type="submit"
@@ -80,9 +91,9 @@ $actionLabels = [
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">締結日</dt>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">締結日時</dt>
                             <dd class="mt-1 text-sm text-gray-900">
-                                {{ $contract->signed_at?->format('Y年m月d日') ?? '—' }}
+                                {{ $contract->signed_at?->format('Y年m月d日 H:i') ?? '—' }}
                             </dd>
                         </div>
                         @if ($contract->notes)
@@ -147,10 +158,89 @@ $actionLabels = [
                 </div>
             </div>
 
-            {{-- Section 3: Latest PDF --}}
+            {{-- Section 3: Electronic consent --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
+                {{ $contract->status === 'signed' ? 'border-green-500' : ($contract->sign_token ? 'border-violet-500' : 'border-gray-300') }}">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 電子同意</h3>
+                </div>
+                <div class="p-6">
+
+                    @if ($contract->status === 'signed')
+                        {{-- Signed info --}}
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">同意者氏名</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $contract->signer_name ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">同意者メール</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $contract->signer_email ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">同意日時</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $contract->signed_at?->format('Y年m月d日 H:i') ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">同意者IP</dt>
+                                <dd class="mt-1 text-sm text-gray-500 font-mono">{{ $contract->signer_ip_address ?? '—' }}</dd>
+                            </div>
+                        </dl>
+
+                    @elseif ($contract->sign_token)
+                        {{-- Token issued — show URL with copy button --}}
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-3">
+                                以下のURLを相手先に共有してください。有効期限：
+                                <span class="font-medium text-gray-800">
+                                    {{ $contract->sign_token_expires_at->format('Y年m月d日 H:i') }}
+                                </span>
+                            </p>
+                            <div x-data="{ copied: false }" class="flex items-center gap-2">
+                                <input type="text"
+                                       readonly
+                                       value="{{ route('sign.contracts.show', $contract->sign_token) }}"
+                                       class="flex-1 text-sm border-gray-300 rounded-md bg-gray-50 font-mono text-gray-600 px-3 py-2 focus:outline-none"
+                                       onclick="this.select()">
+                                <button type="button"
+                                        @click="navigator.clipboard.writeText('{{ route('sign.contracts.show', $contract->sign_token) }}'); copied = true; setTimeout(() => copied = false, 2500)"
+                                        class="px-3 py-2 text-sm font-medium rounded-md border transition-colors"
+                                        :class="copied ? 'bg-green-100 border-green-300 text-green-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'">
+                                    <span x-show="!copied">コピー</span>
+                                    <span x-show="copied" x-cloak>コピー済</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}" class="inline">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm text-violet-600 hover:text-violet-800 font-medium">
+                                URLを再発行する（現在のURLは無効になります）
+                            </button>
+                        </form>
+
+                    @else
+                        {{-- No token yet --}}
+                        <p class="text-sm text-gray-500 mb-4">
+                            同意URLを発行すると、ログイン不要で相手が契約内容を確認・同意できます。
+                        </p>
+                        <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                                同意URLを発行する
+                            </button>
+                        </form>
+                    @endif
+
+                </div>
+            </div>
+
+            {{-- Section 4: Latest PDF --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 最新の契約PDF</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の契約PDF</h3>
                 </div>
 
                 @if ($latestPdf)
@@ -191,11 +281,11 @@ $actionLabels = [
                 @endif
             </div>
 
-            {{-- Section 4: All contract files --}}
+            {{-- Section 5: All contract files --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        4. 契約ファイル一覧
+                        5. 契約ファイル一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contract->files->count() }} 件</span>
                     </h3>
                     <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
@@ -208,9 +298,7 @@ $actionLabels = [
                 </div>
 
                 @if ($contract->files->isEmpty())
-                    <div class="px-6 py-6 text-center text-sm text-gray-400">
-                        ファイルがありません。
-                    </div>
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">ファイルがありません。</div>
                 @else
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -243,8 +331,7 @@ $actionLabels = [
                                               action="{{ route('contracts.files.verify-hash', [$contract, $file]) }}"
                                               class="inline">
                                             @csrf
-                                            <button type="submit"
-                                                    class="text-gray-500 hover:text-gray-800">検証</button>
+                                            <button type="submit" class="text-gray-500 hover:text-gray-800">検証</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -254,19 +341,17 @@ $actionLabels = [
                 @endif
             </div>
 
-            {{-- Section 5: Audit logs --}}
+            {{-- Section 6: Audit logs --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        5. 監査ログ
+                        6. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>
 
                 @if ($auditLogs->isEmpty())
-                    <div class="px-6 py-6 text-center text-sm text-gray-400">
-                        ログがありません。
-                    </div>
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">ログがありません。</div>
                 @else
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">

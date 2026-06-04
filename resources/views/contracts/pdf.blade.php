@@ -242,6 +242,31 @@
         </div>
         @endif
 
+        {{-- Signer Info (only when signed) --}}
+        @if ($contract->status === 'signed' && $contract->signer_name)
+        <div class="section">
+            <div class="section-title">電子同意情報</div>
+            <table class="dl">
+                <tr>
+                    <td class="label">同意者氏名</td>
+                    <td class="value">{{ $contract->signer_name }}</td>
+                </tr>
+                <tr>
+                    <td class="label">同意者メール</td>
+                    <td class="value">{{ $contract->signer_email }}</td>
+                </tr>
+                <tr>
+                    <td class="label">同意日時</td>
+                    <td class="value">{{ $contract->signed_at ? $contract->signed_at->format('Y年m月d日 H:i:s') : '—' }}</td>
+                </tr>
+                <tr>
+                    <td class="label">同意者IPアドレス</td>
+                    <td class="value">{{ $contract->signer_ip_address ?? '—' }}</td>
+                </tr>
+            </table>
+        </div>
+        @endif
+
         {{-- Footer --}}
         <div class="generated-at">
             生成日時：{{ now()->format('Y年m月d日 H:i') }}
