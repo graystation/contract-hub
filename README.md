@@ -1,58 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Contract Hub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+小規模法人向けの契約・請求・入金管理システムです。
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Contract Hub は、Webサイト広告掲載・ITコンサルティング・AI導入支援などの業務委託契約を中心に、以下のライフサイクルを一元管理するための業務システムです。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+> **注意：** このシステムは電子署名サービスそのものではありません。目的は契約・請求・入金の実務管理であり、PDF保存・同意ログ・SHA256ハッシュによる改ざん検知を通じて、合理的な証跡管理を実現します。
 
-## Learning Laravel
+### 主な機能
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| 分類 | 機能 |
+|---|---|
+| 顧客管理 | Company CRUD |
+| 案件管理 | Project CRUD |
+| 契約管理 | Contract CRUD |
+| 契約証跡 | 契約PDF生成・SHA256保存・ハッシュ検証 |
+| 電子同意 | 同意URL発行・外部同意フォーム・有効期限管理 |
+| メール通知 | 同意依頼メール・締結完了通知メール |
+| 請求管理 | Invoice CRUD・自動採番・10%税自動計算 |
+| 入金管理 | Payment CRUD・残高管理・ステータス自動更新 |
+| 請求書PDF | 請求書PDF生成・SHA256保存 |
+| 請求書メール | 顧客への請求書PDF添付メール送信 |
+| 監査ログ | 全主要操作のIP/UA付き記録 |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Tech Stack
 
-## Agentic Development
+| 項目 | 内容 |
+|---|---|
+| Framework | Laravel 12 |
+| PHP | 8.4 |
+| Database | MySQL |
+| Auth | Laravel Breeze |
+| Template | Blade + Tailwind CSS |
+| PDF | barryvdh/laravel-dompdf |
+| Mail | Laravel Mail |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
+
+## Local Setup
 
 ```bash
-composer require laravel/boost --dev
+git clone https://github.com/graystation/contract-hub.git
+cd contract-hub
 
-php artisan boost:install
+composer install
+npm install
+
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+`.env` を編集して DB 接続情報を設定してください。
 
-## Contributing
+```bash
+php artisan migrate --seed
+npm run build
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+ブラウザで `http://localhost:8000` を開き、シードで作成したユーザーでログインします。
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Test
 
-## Security Vulnerabilities
+```bash
+php artisan test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+現在 117 テストが PASSED の状態で維持されています。
+
+新機能を追加する場合は、既存テストを壊さずに Feature test を追加してください。
+
+---
+
+## Mail
+
+開発環境では `log` mailer を推奨します。
+
+```dotenv
+MAIL_MAILER=log
+```
+
+メール本文は以下で確認できます。
+
+```bash
+tail -f storage/logs/laravel.log
+```
+
+本番環境では SMTP を設定してください。詳細は [デプロイチェックリスト](docs/deployment-checklist.md) を参照。
+
+---
+
+## Storage
+
+以下のディレクトリにPDFが保存されます。
+
+| パス | 用途 |
+|---|---|
+| `storage/app/contracts/` | 契約書PDF |
+| `storage/app/invoices/` | 請求書PDF |
+
+**これらのディレクトリは定期バックアップの対象として設定してください。**
+
+データベースの dump と合わせて、少なくとも週次でバックアップを取得することを推奨します。
+
+---
+
+## Japanese Font (PDF)
+
+PDF生成には日本語フォントが必要です。
+
+開発環境（macOS）では以下を使用しています。
+
+```
+/Library/Fonts/Arial Unicode.ttf
+```
+
+Linux サーバーへデプロイする場合は、IPAexGothic などの日本語フォントをインストールし、PDF テンプレート（`resources/views/contracts/pdf.blade.php`、`resources/views/invoices/pdf.blade.php`）の `@font-face` src パスを更新してください。
+
+---
+
+## Important Notes
+
+- このシステムは電子署名サービス（PKI証明書、法的効力のある電子署名）ではありません
+- 電子同意は同意ログの記録を目的としており、法的効力の保証はありません
+- SHA256ハッシュは改ざん検知の補助手段です
+- 本番環境では必ずHTTPSを使用してください
+- 管理画面ルートはすべて認証必須（`auth` + `verified` middleware）です
+- 外部公開ルートは同意フォーム（`/sign/contracts/{token}`）のみです
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Private — All rights reserved.

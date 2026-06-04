@@ -34,8 +34,9 @@ Primary goals:
 - Invoice management
 - Payment tracking
 - Contract evidence storage
+- Audit logging
 
-Out of scope:
+Out of scope (do not implement):
 
 - PKI infrastructure
 - Certificate authorities
@@ -43,10 +44,52 @@ Out of scope:
 - Legal-grade electronic signature services
 - Blockchain-based contract systems
 - Complex cryptographic frameworks
+- Google Drive integration
+- Accounting software integration (freee, MayCloud, etc.)
+- Credit card / payment processing
+- External electronic contract services (CloudSign, etc.)
+- Complex identity verification
 
-The goal is to create a practical and legally reasonable business workflow system.
+The goal is a practical and legally reasonable business workflow system.
 
 Electronic consent and audit logging are sufficient.
+
+---
+
+## Implementation Status
+
+### Completed
+
+- Authentication (Laravel Breeze)
+- Companies CRUD
+- Projects CRUD
+- Contracts CRUD
+- Contract PDF generation (dompdf)
+- Contract PDF storage + SHA256 hash
+- Hash verification
+- Electronic consent URL (sign_token, 14-day expiry)
+- External consent form (no login required)
+- Consent request email (ContractSignRequestMail)
+- Contract-signed notification email (ContractSignedNotificationMail)
+- Invoices CRUD (auto-numbering INV-YYYY-NNNN, 10% tax calculation)
+- Payments CRUD (status auto-update based on paid amount)
+- Invoice model accessors (paid_amount, unpaid_amount, is_overdue, is_due_soon, etc.)
+- Invoice PDF generation + SHA256 hash storage
+- Invoice PDF download
+- Invoice send email with PDF attachment (InvoiceSendMail)
+- Dashboard (all-time + monthly billing stats, unpaid invoice list)
+- AuditLog for all major operations
+- fmt_amount() helper
+
+### Not Yet Implemented
+
+- Production SMTP configuration
+- Google Drive integration
+- Accounting software export
+- Invoice PDF hash verification (similar to contract hash verify)
+- Bulk invoice operations
+- Contract renewal reminders
+- Automated backup scripts
 
 ---
 
@@ -71,6 +114,7 @@ The UI should prioritize usability and operational efficiency.
 - Blade
 - Tailwind CSS
 - Laravel Breeze
+- barryvdh/laravel-dompdf
 
 Do NOT introduce:
 
@@ -97,10 +141,11 @@ Expected data:
 - Companies
 - Projects
 - Contracts
+- ContractFiles
 - Invoices
 - Payments
-- Audit Logs
-- Contract Files
+- InvoiceFiles
+- AuditLogs
 
 The system is expected to become a long-term business asset.
 
@@ -118,16 +163,24 @@ Use:
 - Eloquent relationships
 - Service classes
 - Resource Controllers
+- Model accessors for computed properties
 
 Avoid:
 
 - Fat Controllers
 - Business logic inside Blade templates
 - Raw SQL when Eloquent is appropriate
+- Inline computation in views (use model accessors instead)
 
 Code comments must be written in English.
 
 Prefer readable code over clever code.
+
+**Before adding significant new features:**
+
+1. Run `php artisan test` — all tests must pass
+2. Add Feature tests for the new functionality
+3. Do not break existing tests
 
 ---
 
@@ -153,218 +206,37 @@ Business software should feel stable and predictable.
 
 ---
 
-## Data Model
+## Data Model Summary
 
-### Companies
-
-Represents customers and business partners.
-
-Fields:
-
-- company_name
-- contact_name
-- email
-- phone
-- address
-- notes
+### Companies → Projects → Contracts → ContractFiles
+### Projects → Invoices → Payments
+### Projects → Invoices → InvoiceFiles
+### All operations → AuditLogs
 
 ---
 
-### Projects
+## Storage
 
-Represents individual engagements.
+PDF files are stored in two locations:
 
-Examples:
+- `storage/app/contracts/` — contract PDFs
+- `storage/app/invoices/` — invoice PDFs
 
-- Website advertisement
-- Consulting engagement
-- AI implementation support
+Both are configured as named disks in `config/filesystems.php`.
 
-Fields:
-
-- company_id
-- title
-- type
-- description
-- status
-- started_at
-- ended_at
-
-Project types:
-
-- advertisement
-- consulting
-- other
+These directories must be included in any backup strategy.
 
 ---
 
-### Contracts
+## Mail
 
-Represents agreements related to projects.
+All mail uses Laravel Mail.
 
-Fields:
+For development: `MAIL_MAILER=log` (output to `storage/logs/laravel.log`)
 
-- project_id
-- contract_number
-- contract_type
-- status
-- signed_at
-- notes
+For production: configure SMTP in `.env`
 
-Status:
-
-- draft
-- sent
-- signed
-- cancelled
-
----
-
-### Invoices
-
-Represents invoices issued to customers.
-
-Fields:
-
-- project_id
-- invoice_number
-- amount
-- issued_at
-- due_date
-- status
-
-Status:
-
-- unpaid
-- paid
-
----
-
-### Payments
-
-Represents incoming payments.
-
-Fields:
-
-- invoice_id
-- amount
-- paid_at
-- memo
-
----
-
-### Audit Logs
-
-Represents important system events.
-
-Examples:
-
-- Contract created
-- Contract signed
-- Invoice issued
-- Payment recorded
-
-Fields:
-
-- user_id
-- action
-- target_type
-- target_id
-- ip_address
-- user_agent
-- created_at
-
----
-
-## Contract Evidence Strategy
-
-When a contract is signed:
-
-Store:
-
-- Contract PDF
-- SHA256 hash
-- Audit log entry
-- Signed timestamp
-- Email address
-- IP address
-- User agent
-
-Generate an evidence package.
-
-Example:
-
-contracts/CON-2026-001/
-
-- contract.pdf
-- contract.sha256
-- audit.json
-- signed_at.txt
-
-The purpose is evidence preservation and operational safety.
-
----
-
-## Backup Strategy
-
-The system should support automated backups.
-
-Important contract data should be stored in multiple locations.
-
-Examples:
-
-- Local storage
-- Cloud storage
-- Email notification
-
-The objective is resilience against accidental deletion and server failure.
-
----
-
-## Development Roadmap
-
-### Phase 1
-
-Implement:
-
-- Authentication
-- Companies
-- Projects
-- Contracts
-- Dashboard
-
-Do not implement later phases yet.
-
----
-
-### Phase 2
-
-Implement:
-
-- PDF generation
-- Contract sharing links
-- Electronic consent
-- Audit logs
-
----
-
-### Phase 3
-
-Implement:
-
-- Invoices
-- Payments
-- Revenue tracking
-
----
-
-### Phase 4
-
-Implement:
-
-- Evidence packages
-- Backup automation
-- Contract renewal reminders
+Admin notification email: `CONTRACT_ADMIN_EMAIL` in `.env`
 
 ---
 
