@@ -4,6 +4,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractFileController;
+use App\Http\Controllers\ContractMailController;
 use App\Http\Controllers\ContractSigningController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -38,6 +39,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Contract signing: generate sign URL (admin only)
     Route::post('contracts/{contract}/generate-sign-url', [ContractSigningController::class, 'generate'])
         ->name('contracts.sign-url.generate');
+
+    // Contract mail: send consent URL email (admin only)
+    Route::post('contracts/{contract}/send-sign-request', [ContractMailController::class, 'sendSignRequest'])
+        ->name('contracts.mail.send-sign-request');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

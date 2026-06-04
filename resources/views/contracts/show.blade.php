@@ -4,8 +4,10 @@ $actionLabels = [
     'contract_file_hash_verified_matched'        => 'ハッシュ検証（一致）',
     'contract_file_hash_verified_mismatched'     => 'ハッシュ検証（不一致）',
     'contract_file_hash_verified_missing'        => 'ハッシュ検証（ファイルなし）',
-    'contract_sign_url_generated'               => '同意URL発行',
-    'contract_signed_by_external_user'          => '電子同意完了',
+    'contract_sign_url_generated'                    => '同意URL発行',
+    'contract_signed_by_external_user'               => '電子同意完了',
+    'contract_sign_request_mail_sent'                => '同意URLメール送信',
+    'contract_signed_notification_mail_sent'         => '締結完了通知送信',
 ];
 @endphp
 
@@ -167,7 +169,11 @@ $actionLabels = [
                 <div class="p-6">
 
                     @if ($contract->status === 'signed')
-                        {{-- Signed info --}}
+                        {{-- Signed: show signer details --}}
+                        <div class="mb-4 flex items-center gap-2 text-green-700 text-sm font-medium">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            締結済み
+                        </div>
                         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                             <div>
                                 <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">同意者氏名</dt>
@@ -188,23 +194,23 @@ $actionLabels = [
                         </dl>
 
                     @elseif ($contract->sign_token)
-                        {{-- Token issued — show URL with copy button --}}
-                        <div class="mb-4">
-                            <p class="text-sm text-gray-600 mb-3">
-                                以下のURLを相手先に共有してください。有効期限：
-                                <span class="font-medium text-gray-800">
-                                    {{ $contract->sign_token_expires_at->format('Y年m月d日 H:i') }}
+                        {{-- Token issued: show URL + mail button --}}
+                        <div class="mb-5">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm font-medium text-gray-700">同意URL</p>
+                                <span class="text-xs text-gray-400">
+                                    有効期限：{{ $contract->sign_token_expires_at->format('Y/m/d H:i') }}
                                 </span>
-                            </p>
+                            </div>
                             <div x-data="{ copied: false }" class="flex items-center gap-2">
                                 <input type="text"
                                        readonly
                                        value="{{ route('sign.contracts.show', $contract->sign_token) }}"
-                                       class="flex-1 text-sm border-gray-300 rounded-md bg-gray-50 font-mono text-gray-600 px-3 py-2 focus:outline-none"
+                                       class="flex-1 text-xs border-gray-300 rounded-md bg-gray-50 font-mono text-gray-600 px-3 py-2 focus:outline-none"
                                        onclick="this.select()">
                                 <button type="button"
                                         @click="navigator.clipboard.writeText('{{ route('sign.contracts.show', $contract->sign_token) }}'); copied = true; setTimeout(() => copied = false, 2500)"
-                                        class="px-3 py-2 text-sm font-medium rounded-md border transition-colors"
+                                        class="px-3 py-2 text-sm font-medium rounded-md border transition-colors whitespace-nowrap"
                                         :class="copied ? 'bg-green-100 border-green-300 text-green-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'">
                                     <span x-show="!copied">コピー</span>
                                     <span x-show="copied" x-cloak>コピー済</span>
@@ -212,10 +218,31 @@ $actionLabels = [
                             </div>
                         </div>
 
+                        {{-- Mail send button --}}
+                        @if ($contract->project->company->email)
+                            <div class="mb-4 flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-md">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-violet-800">メール送信先</p>
+                                    <p class="text-sm text-violet-700 truncate">{{ $contract->project->company->email }}</p>
+                                </div>
+                                <form method="POST" action="{{ route('contracts.mail.send-sign-request', $contract) }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700 whitespace-nowrap">
+                                        メール送信
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <p class="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-md px-3 py-2 mb-4">
+                                顧客のメールアドレスが未登録のため、メール送信できません。
+                            </p>
+                        @endif
+
                         <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}" class="inline">
                             @csrf
                             <button type="submit"
-                                    class="text-sm text-violet-600 hover:text-violet-800 font-medium">
+                                    class="text-xs text-gray-400 hover:text-gray-600">
                                 URLを再発行する（現在のURLは無効になります）
                             </button>
                         </form>
@@ -225,13 +252,32 @@ $actionLabels = [
                         <p class="text-sm text-gray-500 mb-4">
                             同意URLを発行すると、ログイン不要で相手が契約内容を確認・同意できます。
                         </p>
-                        <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
-                                同意URLを発行する
-                            </button>
-                        </form>
+                        <div class="flex items-center gap-3">
+                            <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-white border border-violet-400 text-violet-700 text-sm font-medium rounded-md hover:bg-violet-50">
+                                    URLのみ発行
+                                </button>
+                            </form>
+                            @if ($contract->project->company->email)
+                                <form method="POST" action="{{ route('contracts.mail.send-sign-request', $contract) }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                                        URLを発行してメール送信
+                                    </button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                                        同意URLを発行する
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     @endif
 
                 </div>

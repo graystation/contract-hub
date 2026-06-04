@@ -115,4 +115,7 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    // Recipient for contract-related admin notifications
+    'contract_admin' => env('CONTRACT_ADMIN_EMAIL'),
+
 ];
