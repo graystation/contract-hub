@@ -81,16 +81,16 @@
                     <div class="grid grid-cols-3 gap-6 text-center">
                         <div>
                             <div class="text-xs text-gray-500 uppercase tracking-wide">請求合計</div>
-                            <div class="mt-1 text-lg font-bold text-gray-900">¥{{ number_format($invoiceSummary['total']) }}</div>
+                            <div class="mt-1 text-lg font-bold text-gray-900">{{ fmt_amount($invoiceSummary['total']) }}</div>
                         </div>
                         <div>
                             <div class="text-xs text-gray-500 uppercase tracking-wide">入金済</div>
-                            <div class="mt-1 text-lg font-bold text-green-700">¥{{ number_format($invoiceSummary['paid']) }}</div>
+                            <div class="mt-1 text-lg font-bold text-green-700">{{ fmt_amount($invoiceSummary['paid']) }}</div>
                         </div>
                         <div>
                             <div class="text-xs text-gray-500 uppercase tracking-wide">未入金</div>
                             <div class="mt-1 text-lg font-bold {{ $invoiceSummary['unpaid'] > 0 ? 'text-red-600' : 'text-gray-400' }}">
-                                ¥{{ number_format($invoiceSummary['unpaid']) }}
+                                {{ fmt_amount($invoiceSummary['unpaid']) }}
                             </div>
                         </div>
                     </div>

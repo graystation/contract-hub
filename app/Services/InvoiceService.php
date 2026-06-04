@@ -14,8 +14,7 @@ class InvoiceService
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Invoice::with('project.company')
-            ->withSum('payments', 'amount')
+        return Invoice::with('project.company', 'payments')
             ->orderByDesc('created_at')
             ->paginate($perPage);
     }

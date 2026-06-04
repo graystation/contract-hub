@@ -181,13 +181,13 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">{{ $inv->title }}</td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                                        ¥{{ number_format($inv->total_amount) }}
+                                        {{ fmt_amount($inv->total_amount) }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-right text-green-700">
-                                        ¥{{ number_format($inv->payments_sum_amount ?? 0) }}
+                                        {{ fmt_amount($inv->paid_amount) }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap">
-                                        <x-status-badge :status="$inv->status" type="invoice" />
+                                        <x-invoice-status :invoice="$inv" />
                                     </td>
                                 </tr>
                             @endforeach

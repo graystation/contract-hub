@@ -1,8 +1,4 @@
 @php
-$totalPaid   = $invoice->payments->sum('amount');
-$remaining   = $invoice->total_amount - $totalPaid;
-$isOverpaid  = $totalPaid > $invoice->total_amount;
-
 $auditActionLabels = [
     'invoice_created'                  => '請求書作成',
     'invoice_updated'                  => '請求書更新',
@@ -73,7 +69,10 @@ $auditActionLabels = [
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">ステータス</dt>
-                            <dd class="mt-1"><x-status-badge :status="$invoice->status" type="invoice" /></dd>
+                            <dd class="mt-1 flex items-center gap-2">
+                                <x-status-badge :status="$invoice->status" type="invoice" />
+                                <x-invoice-status :invoice="$invoice" />
+                            </dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">発行日 / 支払期限</dt>
@@ -132,32 +131,32 @@ $auditActionLabels = [
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 金額内訳</h3>
                 </div>
                 <div class="p-6">
-                    @if ($isOverpaid)
+                    @if ($invoice->is_overpaid)
                         <div class="mb-4 px-3 py-2 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded text-sm">
-                            ⚠ 過入金が発生しています（過払い額：¥{{ number_format($totalPaid - $invoice->total_amount) }}）
+                            ⚠ 過入金が発生しています（過払い額：{{ fmt_amount($invoice->overpaid_amount) }}）
                         </div>
                     @endif
                     <dl class="space-y-3">
                         <div class="flex justify-between text-sm">
                             <dt class="text-gray-500">税抜金額</dt>
-                            <dd class="text-gray-900">¥{{ number_format($invoice->amount) }}</dd>
+                            <dd class="text-gray-900">{{ fmt_amount($invoice->amount) }}</dd>
                         </div>
                         <div class="flex justify-between text-sm">
                             <dt class="text-gray-500">消費税（10%）</dt>
-                            <dd class="text-gray-900">¥{{ number_format($invoice->tax_amount) }}</dd>
+                            <dd class="text-gray-900">{{ fmt_amount($invoice->tax_amount) }}</dd>
                         </div>
                         <div class="flex justify-between font-medium border-t border-gray-100 pt-2">
                             <dt class="text-gray-700">税込合計</dt>
-                            <dd class="text-gray-900 text-base">¥{{ number_format($invoice->total_amount) }}</dd>
+                            <dd class="text-gray-900 text-base">{{ fmt_amount($invoice->total_amount) }}</dd>
                         </div>
                         <div class="flex justify-between text-sm">
                             <dt class="text-green-700">入金済額</dt>
-                            <dd class="text-green-700 font-medium">¥{{ number_format($totalPaid) }}</dd>
+                            <dd class="text-green-700 font-medium">{{ fmt_amount($invoice->paid_amount) }}</dd>
                         </div>
                         <div class="flex justify-between text-sm border-t border-gray-100 pt-2">
-                            <dt class="{{ $remaining > 0 ? 'text-red-600' : 'text-gray-500' }}">未入金額</dt>
-                            <dd class="{{ $remaining > 0 ? 'text-red-600 font-medium' : 'text-gray-500' }}">
-                                ¥{{ number_format(max(0, $remaining)) }}
+                            <dt class="{{ $invoice->unpaid_amount > 0 ? 'text-red-600' : 'text-gray-500' }}">未入金額</dt>
+                            <dd class="{{ $invoice->unpaid_amount > 0 ? 'text-red-600 font-medium' : 'text-gray-500' }}">
+                                {{ fmt_amount($invoice->unpaid_amount) }}
                             </dd>
                         </div>
                     </dl>
@@ -193,7 +192,7 @@ $auditActionLabels = [
                                         {{ $payment->paid_at->format('Y/m/d') }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900">
-                                        ¥{{ number_format($payment->amount) }}
+                                        {{ fmt_amount($payment->amount) }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">
                                         {{ \App\Models\Payment::METHOD_LABELS[$payment->method] ?? $payment->method }}

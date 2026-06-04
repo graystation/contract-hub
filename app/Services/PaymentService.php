@@ -62,6 +62,7 @@ class PaymentService
     /**
      * Derive invoice status from total payments and update if it changed.
      *
+     *   cancelled               → skip (never auto-update)
      *   totalPaid >= total_amount → paid
      *   totalPaid > 0             → issued
      *   totalPaid = 0, was paid   → issued
@@ -69,6 +70,10 @@ class PaymentService
      */
     private function recalculateInvoiceStatus(Invoice $invoice, Request $request): void
     {
+        if ($invoice->status === 'cancelled') {
+            return;
+        }
+
         $totalPaid = $invoice->payments()->sum('amount');
         $previous  = $invoice->status;
 
