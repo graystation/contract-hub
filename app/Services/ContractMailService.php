@@ -20,7 +20,7 @@ class ContractMailService
      * Send the consent URL to the contract's company email.
      * Issues a sign token first if one has not been generated yet.
      *
-     * @throws \RuntimeException When the company has no email address.
+     * @throws \RuntimeException When no company email exists, or when mail sending fails.
      */
     public function sendSignRequest(Contract $contract, Request $request): void
     {
@@ -35,20 +35,46 @@ class ContractMailService
 
         $signUrl = route('sign.contracts.show', $contract->sign_token);
 
-        Mail::to($contract->project->company->email)
-            ->send(new ContractSignRequestMail($contract, $signUrl));
+        try {
+            Mail::to($contract->project->company->email)
+                ->send(new ContractSignRequestMail($contract, $signUrl));
 
-        $this->auditLogService->log(
-            action: 'contract_sign_request_mail_sent',
-            targetType: 'contract',
-            targetId: $contract->id,
-            request: $request,
-        );
+            $this->auditLogService->log(
+                action: 'contract_sign_request_mail_sent',
+                targetType: 'contract',
+                targetId: $contract->id,
+                request: $request,
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contract sign request mail', [
+                'contract_id'     => $contract->id,
+                'contract_number' => $contract->contract_number,
+                'mail_type'       => ContractSignRequestMail::class,
+                'error'           => $e->getMessage(),
+            ]);
+
+            try {
+                $this->auditLogService->log(
+                    action: 'contract_sign_request_mail_failed',
+                    targetType: 'contract',
+                    targetId: $contract->id,
+                    request: $request,
+                );
+            } catch (\Throwable $auditE) {
+                Log::error('Failed to create failure audit log for sign request mail', [
+                    'contract_id' => $contract->id,
+                    'error'       => $auditE->getMessage(),
+                ]);
+            }
+
+            // Re-throw so the controller can display an actionable error
+            throw new \RuntimeException('メール送信に失敗しました。URLをコピーして手動で送信してください。');
+        }
     }
 
     /**
      * Notify the admin that a contract has been signed.
-     * Errors are caught internally — mail failure must not interrupt signing.
+     * All errors are caught internally — mail failure must not interrupt signing.
      */
     public function sendSignedNotification(Contract $contract, Request $request): void
     {
@@ -66,9 +92,25 @@ class ContractMailService
             );
         } catch (\Throwable $e) {
             Log::error('Failed to send contract signed notification mail', [
-                'contract_id' => $contract->id,
-                'error'       => $e->getMessage(),
+                'contract_id'     => $contract->id,
+                'contract_number' => $contract->contract_number,
+                'mail_type'       => ContractSignedNotificationMail::class,
+                'error'           => $e->getMessage(),
             ]);
+
+            try {
+                $this->auditLogService->log(
+                    action: 'contract_signed_notification_mail_failed',
+                    targetType: 'contract',
+                    targetId: $contract->id,
+                    request: $request,
+                );
+            } catch (\Throwable $auditE) {
+                Log::error('Failed to create failure audit log for notification mail', [
+                    'contract_id' => $contract->id,
+                    'error'       => $auditE->getMessage(),
+                ]);
+            }
         }
     }
 }

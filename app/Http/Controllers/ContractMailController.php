@@ -20,9 +20,12 @@ class ContractMailController extends Controller
         try {
             $this->service->sendSignRequest($contract, $request);
         } catch (\RuntimeException $e) {
+            // Distinguish "no email" (warning) from mail send failure (error)
+            $isMailFailure = str_contains($e->getMessage(), 'メール送信に失敗');
+
             return redirect()
                 ->route('contracts.show', $contract)
-                ->with('warning', $e->getMessage());
+                ->with($isMailFailure ? 'error' : 'warning', $e->getMessage());
         }
 
         return redirect()

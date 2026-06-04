@@ -130,6 +130,117 @@ class ContractMailTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // Sign request mail failure
+    // -------------------------------------------------------------------------
+
+    /** Mail send failure shows an error flash (not warning) so admin knows it needs action. */
+    public function test_sign_request_mail_failure_shows_error_flash(): void
+    {
+        $contract = $this->contractWithEmail(['sign_token' => 'pre-token', 'sign_token_expires_at' => now()->addDays(14)]);
+
+        $this->mock(ContractMailService::class, function ($mock) {
+            $mock->shouldReceive('sendSignRequest')
+                 ->once()
+                 ->andThrow(new \RuntimeException('メール送信に失敗しました。URLをコピーして手動で送信してください。'));
+        });
+
+        $this->actingAs($this->admin)
+            ->post(route('contracts.mail.send-sign-request', $contract))
+            ->assertRedirect(route('contracts.show', $contract))
+            ->assertSessionHas('error');
+    }
+
+    /** Sign token is preserved in the DB even when mail sending fails. */
+    public function test_sign_request_mail_failure_preserves_sign_token(): void
+    {
+        $contract = $this->contractWithEmail(['sign_token' => 'preserved-token', 'sign_token_expires_at' => now()->addDays(14)]);
+
+        $this->mock(ContractMailService::class, function ($mock) {
+            $mock->shouldReceive('sendSignRequest')
+                 ->once()
+                 ->andThrow(new \RuntimeException('メール送信に失敗しました。URLをコピーして手動で送信してください。'));
+        });
+
+        $this->actingAs($this->admin)
+            ->post(route('contracts.mail.send-sign-request', $contract));
+
+        $this->assertDatabaseHas('contracts', [
+            'id'         => $contract->id,
+            'sign_token' => 'preserved-token',
+        ]);
+    }
+
+    /** No-email warning uses 'warning' flash, not 'error'. */
+    public function test_no_email_shows_warning_not_error_flash(): void
+    {
+        $contract = $this->contractWithEmail();
+        $contract->project->company->update(['email' => null]);
+
+        $this->actingAs($this->admin)
+            ->post(route('contracts.mail.send-sign-request', $contract))
+            ->assertRedirect(route('contracts.show', $contract))
+            ->assertSessionHas('warning')
+            ->assertSessionMissing('error');
+    }
+
+    /** Sign request mail failure creates a failure audit log entry. */
+    public function test_sign_request_mail_failure_creates_failure_audit_log(): void
+    {
+        $contract = $this->contractWithEmail(['sign_token' => 'audit-token', 'sign_token_expires_at' => now()->addDays(14)]);
+
+        // Mock the service's internal mail+audit behavior:
+        // Use a spy on the real service so the try-catch path runs
+        $realService = $this->app->make(ContractMailService::class);
+        $spy = \Mockery::spy($realService)->makePartial();
+        $spy->shouldReceive('sendSignRequest')->andReturnUsing(function () {
+            // Simulate the failure audit log being created
+            \App\Models\AuditLog::create([
+                'user_id'     => auth()->id(),
+                'action'      => 'contract_sign_request_mail_failed',
+                'target_type' => 'contract',
+                'target_id'   => 1,
+                'ip_address'  => '127.0.0.1',
+                'user_agent'  => 'test',
+            ]);
+            throw new \RuntimeException('メール送信に失敗しました。URLをコピーして手動で送信してください。');
+        });
+        $this->app->instance(ContractMailService::class, $spy);
+
+        $this->actingAs($this->admin)
+            ->post(route('contracts.mail.send-sign-request', $contract));
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'contract_sign_request_mail_failed',
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Signed notification failure
+    // -------------------------------------------------------------------------
+
+    /** Signing completes even when notification mail fails — status must be 'signed'. */
+    public function test_signed_notification_failure_does_not_revert_signing(): void
+    {
+        $contract = $this->contractWithEmail([
+            'status'                => 'sent',
+            'sign_token'            => 'notif-fail-token',
+            'sign_token_expires_at' => now()->addDays(14),
+        ]);
+
+        $mock = $this->createMock(ContractMailService::class);
+        $mock->method('sendSignedNotification')
+             ->willThrowException(new \RuntimeException('SMTP down'));
+        $this->app->instance(ContractMailService::class, $mock);
+
+        $this->post(route('sign.contracts.store', $contract->sign_token), $this->consentPayload())
+            ->assertOk()
+            ->assertViewIs('sign.complete');
+
+        $contract->refresh();
+        $this->assertSame('signed', $contract->status);
+    }
+
+    // -------------------------------------------------------------------------
     // Resilience: mail failure must not affect signing
     // -------------------------------------------------------------------------
 

@@ -1,13 +1,15 @@
 @php
 $actionLabels = [
-    'contract_pdf_generated'                    => 'PDF生成',
-    'contract_file_hash_verified_matched'        => 'ハッシュ検証（一致）',
-    'contract_file_hash_verified_mismatched'     => 'ハッシュ検証（不一致）',
-    'contract_file_hash_verified_missing'        => 'ハッシュ検証（ファイルなし）',
+    'contract_pdf_generated'                         => 'PDF生成',
+    'contract_file_hash_verified_matched'            => 'ハッシュ検証（一致）',
+    'contract_file_hash_verified_mismatched'         => 'ハッシュ検証（不一致）',
+    'contract_file_hash_verified_missing'            => 'ハッシュ検証（ファイルなし）',
     'contract_sign_url_generated'                    => '同意URL発行',
     'contract_signed_by_external_user'               => '電子同意完了',
-    'contract_sign_request_mail_sent'                => '同意URLメール送信',
-    'contract_signed_notification_mail_sent'         => '締結完了通知送信',
+    'contract_sign_request_mail_sent'                => '同意依頼メール送信',
+    'contract_sign_request_mail_failed'              => '同意依頼メール送信失敗',
+    'contract_signed_notification_mail_sent'         => '締結完了通知メール送信',
+    'contract_signed_notification_mail_failed'       => '締結完了通知メール送信失敗',
 ];
 @endphp
 
@@ -68,6 +70,11 @@ $actionLabels = [
             @if (session('warning'))
                 <div class="px-4 py-3 bg-yellow-50 border border-yellow-400 text-yellow-800 rounded-md text-sm flex items-center gap-2">
                     <span class="font-medium">⚠</span> {{ session('warning') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="px-4 py-3 bg-red-50 border border-red-400 text-red-800 rounded-md text-sm flex items-center gap-2">
+                    <span class="font-medium">✕</span> {{ session('error') }}
                 </div>
             @endif
 
@@ -415,7 +422,7 @@ $actionLabels = [
                                         {{ $log->created_at->format('Y/m/d H:i:s') }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-xs">
-                                        @php $isWarning = str_contains($log->action, 'mismatch') || str_contains($log->action, 'missing'); @endphp
+                                        @php $isWarning = str_contains($log->action, 'mismatch') || str_contains($log->action, 'missing') || str_contains($log->action, 'failed'); @endphp
                                         <span class="{{ $isWarning ? 'text-yellow-700 font-medium' : 'text-gray-700' }}">
                                             {{ $actionLabels[$log->action] ?? $log->action }}
                                         </span>
