@@ -3,6 +3,7 @@
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoiceFileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractFileController;
@@ -30,6 +31,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::resource('contracts', ContractController::class);
     Route::resource('invoices', InvoiceController::class);
+
+    // Invoice file: PDF generation and download
+    Route::post('invoices/{invoice}/pdf', [InvoiceFileController::class, 'store'])
+        ->name('invoices.pdf.store');
+    Route::get('invoices/{invoice}/files/{invoiceFile}/download', [InvoiceFileController::class, 'download'])
+        ->name('invoices.files.download');
 
     // Payments: nested under invoice for store, standalone for edit/update/destroy
     Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])

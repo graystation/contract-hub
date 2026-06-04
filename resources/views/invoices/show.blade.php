@@ -3,6 +3,7 @@ $auditActionLabels = [
     'invoice_created'                  => '請求書作成',
     'invoice_updated'                  => '請求書更新',
     'invoice_deleted'                  => '請求書削除',
+    'invoice_pdf_generated'            => '請求書PDF生成',
     'payment_created'                  => '入金登録',
     'payment_updated'                  => '入金更新',
     'payment_deleted'                  => '入金削除',
@@ -28,6 +29,13 @@ $auditActionLabels = [
                 </h2>
             </div>
             <div class="flex items-center space-x-2">
+                <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                        PDF生成
+                    </button>
+                </form>
                 <a href="{{ route('invoices.edit', $invoice) }}"
                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
                     編集
@@ -126,7 +134,7 @@ $auditActionLabels = [
             </div>
 
             {{-- Section 3: Amount breakdown --}}
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $invoice->status === 'paid' ? 'border-green-500' : ($isOverpaid ? 'border-yellow-400' : 'border-gray-300') }}">
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $invoice->status === 'paid' ? 'border-green-500' : ($invoice->is_overpaid ? 'border-yellow-400' : 'border-gray-300') }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 金額内訳</h3>
                 </div>
@@ -163,11 +171,103 @@ $auditActionLabels = [
                 </div>
             </div>
 
-            {{-- Section 4: Payments --}}
+            {{-- Section 4: Latest invoice PDF --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の請求書PDF</h3>
+                </div>
+
+                @if ($latestPdf)
+                    <div class="p-6">
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mb-4">
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">ファイル名</dt>
+                                <dd class="mt-1 text-sm font-mono text-gray-900">{{ $latestPdf->file_name }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">生成日時</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $latestPdf->created_at->format('Y/m/d H:i') }}</dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">SHA256</dt>
+                                <dd class="mt-1 text-xs font-mono text-gray-500 break-all">{{ $latestPdf->file_hash ?? '—' }}</dd>
+                            </div>
+                        </dl>
+                        <div class="pt-4 border-t border-gray-100">
+                            <a href="{{ route('invoices.files.download', [$invoice, $latestPdf]) }}"
+                               class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                                ダウンロード
+                            </a>
+                        </div>
+                    </div>
+                @else
+                    <div class="px-6 py-8 text-center text-sm text-gray-400">
+                        請求書PDFが生成されていません。「PDF生成」ボタンから作成してください。
+                    </div>
+                @endif
+            </div>
+
+            {{-- Section 5: All invoice files --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        5. 請求書ファイル一覧
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoice->files->count() }} 件</span>
+                    </h3>
+                    <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
+                        @csrf
+                        <button type="submit"
+                                class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
+                            + PDFを生成
+                        </button>
+                    </form>
+                </div>
+
+                @if ($invoice->files->isEmpty())
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">ファイルがありません。</div>
+                @else
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ファイル名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">生成日時</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SHA256（先頭16字）</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach ($invoice->files as $file)
+                                <tr class="hover:bg-gray-50 {{ $latestPdf && $file->id === $latestPdf->id ? 'bg-emerald-50' : '' }}">
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
+                                        {{ $file->file_name }}
+                                        @if ($latestPdf && $file->id === $latestPdf->id)
+                                            <span class="ml-2 text-xs text-emerald-600 font-sans">最新</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">
+                                        {{ $file->created_at->format('Y/m/d H:i') }}
+                                    </td>
+                                    <td class="px-6 py-3 text-xs font-mono text-gray-400" title="{{ $file->file_hash }}">
+                                        {{ $file->file_hash ? substr($file->file_hash, 0, 16) . '…' : '—' }}
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-right text-sm">
+                                        <a href="{{ route('invoices.files.download', [$invoice, $file]) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                            ダウンロード
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+
+            {{-- Section 6: Payments --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        4. 入金一覧
+                        6. 入金一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoice->payments->count() }} 件</span>
                     </h3>
                 </div>
@@ -258,7 +358,7 @@ $auditActionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        5. 監査ログ
+                        7. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>

@@ -6,12 +6,16 @@ use App\Http\Requests\InvoiceRequest;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Services\InvoiceFileService;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    public function __construct(private InvoiceService $service) {}
+    public function __construct(
+        private InvoiceService $service,
+        private InvoiceFileService $fileService,
+    ) {}
 
     public function index()
     {
@@ -38,8 +42,9 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice, Request $request)
     {
-        $invoice->load('project.company', 'payments');
+        $invoice->load('project.company', 'payments', 'files');
 
+        $latestPdf  = $this->fileService->getLatestPdf($invoice);
         $paymentIds = $invoice->payments->pluck('id');
 
         $auditLogs = AuditLog::where(function ($q) use ($invoice, $paymentIds) {
@@ -51,7 +56,7 @@ class InvoiceController extends Controller
             }
         })->latest()->limit(20)->get();
 
-        return view('invoices.show', compact('invoice', 'auditLogs'));
+        return view('invoices.show', compact('invoice', 'latestPdf', 'auditLogs'));
     }
 
     public function edit(Invoice $invoice)

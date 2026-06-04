@@ -48,6 +48,11 @@ class Invoice extends Model
         return $this->hasMany(Payment::class)->orderByDesc('paid_at');
     }
 
+    public function files(): HasMany
+    {
+        return $this->hasMany(InvoiceFile::class)->orderByDesc('created_at');
+    }
+
     // -------------------------------------------------------------------------
     // Payment amount accessors
     // -------------------------------------------------------------------------
