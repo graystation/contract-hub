@@ -36,7 +36,7 @@ class ContractController extends Controller
 
     public function show(Contract $contract)
     {
-        $contract->load('project.company');
+        $contract->load('project.company', 'files');
 
         return view('contracts.show', compact('contract'));
     }

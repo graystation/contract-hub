@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ContractFileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
@@ -17,6 +18,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('companies', CompanyController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('contracts', ContractController::class);
+
+    // Contract file: PDF generation and download
+    Route::post('contracts/{contract}/pdf', [ContractFileController::class, 'store'])
+        ->name('contracts.pdf.store');
+    Route::get('contracts/{contract}/files/{contractFile}/download', [ContractFileController::class, 'download'])
+        ->name('contracts.files.download');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
