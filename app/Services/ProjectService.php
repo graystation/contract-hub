@@ -9,7 +9,10 @@ class ProjectService
 {
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Project::with('company')->orderByDesc('created_at')->paginate($perPage);
+        return Project::with('company')
+            ->withCount('contracts')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
     }
 
     public function create(array $data): Project

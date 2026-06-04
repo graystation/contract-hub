@@ -31,7 +31,9 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        $company->load('projects');
+        $company->load([
+            'projects' => fn ($q) => $q->withCount('contracts')->orderByDesc('created_at'),
+        ]);
 
         return view('companies.show', compact('company'));
     }

@@ -9,7 +9,9 @@ class CompanyService
 {
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Company::orderBy('company_name')->paginate($perPage);
+        return Company::withCount('projects')
+            ->orderBy('company_name')
+            ->paginate($perPage);
     }
 
     public function create(array $data): Company

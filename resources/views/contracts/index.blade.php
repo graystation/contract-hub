@@ -1,64 +1,72 @@
-@php
-$statusLabels = ['draft' => '下書き', 'sent' => '送付済', 'signed' => '締結済', 'cancelled' => 'キャンセル'];
-$statusColors = ['draft' => 'gray', 'sent' => 'yellow', 'signed' => 'green', 'cancelled' => 'red'];
-@endphp
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">契約管理</h2>
-            <a href="{{ route('contracts.create') }}" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
-                新規登録
+            <a href="{{ route('contracts.create') }}"
+               class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                + 新規登録
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('success'))
-                <div class="mb-4 px-4 py-3 bg-green-100 border border-green-400 text-green-800 rounded">
+                <div class="mb-4 px-4 py-3 bg-green-50 border border-green-300 text-green-800 rounded-md text-sm">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約番号</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">顧客 / 案件</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">顧客</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">案件</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約種別</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締結日</th>
                             <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-gray-100">
                         @forelse ($contracts as $contract)
-                            @php $color = $statusColors[$contract->status] ?? 'gray'; @endphp
-                            <tr>
+                            <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <a href="{{ route('contracts.show', $contract) }}" class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                    <a href="{{ route('contracts.show', $contract) }}"
+                                       class="text-indigo-600 hover:text-indigo-900 font-medium text-sm">
                                         {{ $contract->contract_number }}
                                     </a>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    <div>{{ $contract->project->company->company_name }}</div>
-                                    <div class="text-gray-400">{{ $contract->project->title }}</div>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <a href="{{ route('companies.show', $contract->project->company) }}"
+                                       class="text-gray-700 hover:text-indigo-600">
+                                        {{ $contract->project->company->company_name }}
+                                    </a>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $contract->contract_type }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <a href="{{ route('projects.show', $contract->project) }}"
+                                       class="text-gray-700 hover:text-indigo-600">
+                                        {{ $contract->project->title }}
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    {{ $contract->contract_type }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $color }}-100 text-{{ $color }}-800">
-                                        {{ $statusLabels[$contract->status] ?? $contract->status }}
-                                    </span>
+                                    <x-status-badge :status="$contract->status" type="contract" />
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                     {{ $contract->signed_at?->format('Y/m/d') ?? '—' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <a href="{{ route('contracts.edit', $contract) }}" class="text-indigo-600 hover:text-indigo-900">編集</a>
-                                    <form method="POST" action="{{ route('contracts.destroy', $contract) }}" class="inline" onsubmit="return confirm('削除してよろしいですか？')">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                    <a href="{{ route('contracts.edit', $contract) }}"
+                                       class="text-indigo-600 hover:text-indigo-900">編集</a>
+                                    <form method="POST" action="{{ route('contracts.destroy', $contract) }}"
+                                          class="inline"
+                                          onsubmit="return confirm('「{{ $contract->contract_number }}」を削除してよろしいですか？\nこの操作は取り消せません。')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900">削除</button>
@@ -67,14 +75,19 @@ $statusColors = ['draft' => 'gray', 'sent' => 'yellow', 'signed' => 'green', 'ca
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">契約が登録されていません。</td>
+                                <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-400">
+                                    契約が登録されていません。
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="px-6 py-4">
-                    {{ $contracts->links() }}
-                </div>
+
+                @if ($contracts->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-100">
+                        {{ $contracts->links() }}
+                    </div>
+                @endif
             </div>
 
         </div>

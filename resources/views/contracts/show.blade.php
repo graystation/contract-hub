@@ -1,65 +1,132 @@
-@php
-$statusLabels = ['draft' => '下書き', 'sent' => '送付済', 'signed' => '締結済', 'cancelled' => 'キャンセル'];
-@endphp
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">契約詳細 — {{ $contract->contract_number }}</h2>
-            <div class="space-x-2">
-                <a href="{{ route('contracts.edit', $contract) }}" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700">
+            <div>
+                <div class="text-xs text-gray-500 mb-1">
+                    <a href="{{ route('companies.show', $contract->project->company) }}"
+                       class="hover:text-indigo-600">{{ $contract->project->company->company_name }}</a>
+                    <span class="mx-1">›</span>
+                    <a href="{{ route('projects.show', $contract->project) }}"
+                       class="hover:text-indigo-600">{{ $contract->project->title }}</a>
+                    <span class="mx-1">›</span>契約
+                </div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ $contract->contract_number }}
+                </h2>
+            </div>
+            <div class="flex items-center space-x-2">
+                <a href="{{ route('contracts.edit', $contract) }}"
+                   class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
                     編集
                 </a>
-                <a href="{{ route('contracts.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
+                <a href="{{ route('contracts.index') }}"
+                   class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">基本情報</h3>
-                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">契約番号</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $contract->contract_number }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">契約種別</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $contract->contract_type }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">顧客</dt>
-                        <dd class="mt-1 text-sm text-gray-900">
-                            <a href="{{ route('companies.show', $contract->project->company) }}" class="text-indigo-600 hover:text-indigo-900">
-                                {{ $contract->project->company->company_name }}
-                            </a>
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">案件</dt>
-                        <dd class="mt-1 text-sm text-gray-900">
-                            <a href="{{ route('projects.show', $contract->project) }}" class="text-indigo-600 hover:text-indigo-900">
-                                {{ $contract->project->title }}
-                            </a>
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">ステータス</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $statusLabels[$contract->status] ?? $contract->status }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm font-medium text-gray-500">締結日</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $contract->signed_at?->format('Y/m/d') ?? '—' }}</dd>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <dt class="text-sm font-medium text-gray-500">備考</dt>
-                        <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ $contract->notes ?? '—' }}</dd>
-                    </div>
-                </dl>
+    <div class="py-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            @if (session('success'))
+                <div class="px-4 py-3 bg-green-50 border border-green-300 text-green-800 rounded-md text-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Contract Info --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">契約情報</h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">契約番号</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-medium">{{ $contract->contract_number }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">契約種別</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ $contract->contract_type }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">ステータス</dt>
+                            <dd class="mt-1">
+                                <x-status-badge :status="$contract->status" type="contract" />
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">締結日</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {{ $contract->signed_at?->format('Y年m月d日') ?? '—' }}
+                            </dd>
+                        </div>
+                        @if ($contract->notes)
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">備考</dt>
+                                <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ $contract->notes }}</dd>
+                            </div>
+                        @endif
+                    </dl>
+                </div>
             </div>
+
+            {{-- Related Info --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">関連情報</h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">顧客</dt>
+                            <dd class="mt-1 text-sm">
+                                <a href="{{ route('companies.show', $contract->project->company) }}"
+                                   class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                    {{ $contract->project->company->company_name }}
+                                </a>
+                                @if ($contract->project->company->contact_name)
+                                    <span class="text-gray-400 ml-1">
+                                        （{{ $contract->project->company->contact_name }}）
+                                    </span>
+                                @endif
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">案件</dt>
+                            <dd class="mt-1 text-sm">
+                                <a href="{{ route('projects.show', $contract->project) }}"
+                                   class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                    {{ $contract->project->title }}
+                                </a>
+                                <span class="ml-2">
+                                    <x-status-badge :status="$contract->project->status" type="project" />
+                                </span>
+                            </dd>
+                        </div>
+                        @if ($contract->project->company->email)
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">顧客メール</dt>
+                                <dd class="mt-1 text-sm">
+                                    <a href="mailto:{{ $contract->project->company->email }}"
+                                       class="text-indigo-600 hover:underline">
+                                        {{ $contract->project->company->email }}
+                                    </a>
+                                </dd>
+                            </div>
+                        @endif
+                        @if ($contract->project->company->phone)
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">顧客電話</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $contract->project->company->phone }}</dd>
+                            </div>
+                        @endif
+                    </dl>
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
