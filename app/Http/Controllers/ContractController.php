@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ContractRequest;
 use App\Models\Contract;
 use App\Models\Project;
+use App\Services\ContractFileService;
 use App\Services\ContractService;
 
 class ContractController extends Controller
 {
-    public function __construct(private ContractService $service) {}
+    public function __construct(
+        private ContractService $service,
+        private ContractFileService $fileService,
+    ) {}
 
     public function index()
     {
@@ -38,7 +42,10 @@ class ContractController extends Controller
     {
         $contract->load('project.company', 'files');
 
-        return view('contracts.show', compact('contract'));
+        $latestPdf  = $this->fileService->getLatestPdf($contract);
+        $auditLogs  = $this->fileService->getRelatedAuditLogs($contract);
+
+        return view('contracts.show', compact('contract', 'latestPdf', 'auditLogs'));
     }
 
     public function edit(Contract $contract)

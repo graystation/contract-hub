@@ -2,13 +2,19 @@
 
 namespace App\Services;
 
+use App\Models\AuditLog;
 use App\Models\Contract;
 use App\Models\ContractFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 class ContractFileService
 {
+    public const VERIFY_MATCHED    = 'matched';
+    public const VERIFY_MISMATCHED = 'mismatched';
+    public const VERIFY_MISSING    = 'missing';
+
     public function __construct(
         private PdfService $pdfService,
         private AuditLogService $auditLogService,
@@ -44,6 +50,81 @@ class ContractFileService
         );
 
         return $contractFile;
+    }
+
+    /**
+     * Return the most recently created PDF for the contract, or null if none.
+     */
+    public function getLatestPdf(Contract $contract): ?ContractFile
+    {
+        return $contract->files()
+            ->where('file_type', 'pdf')
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * Verify that the file on disk still matches the stored SHA256 hash.
+     * Returns one of the VERIFY_* constants.
+     */
+    public function verifyHash(ContractFile $contractFile, Request $request): string
+    {
+        if (!Storage::disk('contracts')->exists($contractFile->file_path)) {
+            $this->auditLogService->log(
+                action: 'contract_file_hash_verified_missing',
+                targetType: 'contract_file',
+                targetId: $contractFile->id,
+                request: $request,
+            );
+
+            return self::VERIFY_MISSING;
+        }
+
+        $currentHash = hash('sha256', Storage::disk('contracts')->get($contractFile->file_path));
+        $result      = $currentHash === $contractFile->file_hash
+            ? self::VERIFY_MATCHED
+            : self::VERIFY_MISMATCHED;
+
+        $this->auditLogService->log(
+            action: "contract_file_hash_verified_{$result}",
+            targetType: 'contract_file',
+            targetId: $contractFile->id,
+            request: $request,
+        );
+
+        return $result;
+    }
+
+    /**
+     * Check whether the physical file exists on the contracts disk.
+     */
+    public function fileExists(ContractFile $contractFile): bool
+    {
+        return Storage::disk('contracts')->exists($contractFile->file_path);
+    }
+
+    /**
+     * Fetch the latest 20 audit log entries related to a contract and its files.
+     */
+    public function getRelatedAuditLogs(Contract $contract): Collection
+    {
+        $fileIds = $contract->files->pluck('id');
+
+        return AuditLog::where(function ($q) use ($contract, $fileIds) {
+            $q->where('target_type', 'contract')
+              ->where('target_id', $contract->id);
+
+            if ($fileIds->isNotEmpty()) {
+                $q->orWhere(function ($q2) use ($fileIds) {
+                    $q2->where('target_type', 'contract_file')
+                       ->whereIn('target_id', $fileIds);
+                });
+            }
+        })
+        ->with('user')
+        ->latest()
+        ->limit(20)
+        ->get();
     }
 
     /**

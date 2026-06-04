@@ -29,10 +29,7 @@ class ContractFileController extends Controller
      */
     public function download(Contract $contract, ContractFile $contractFile)
     {
-        abort_unless(
-            $contractFile->contract_id === $contract->id,
-            404,
-        );
+        abort_unless($contractFile->contract_id === $contract->id, 404);
 
         abort_unless(
             Storage::disk('contracts')->exists($contractFile->file_path),
@@ -44,5 +41,25 @@ class ContractFileController extends Controller
             $contractFile->file_path,
             $contractFile->file_name,
         );
+    }
+
+    /**
+     * Re-compute SHA256 of the stored file and compare against the recorded hash.
+     */
+    public function verifyHash(Contract $contract, ContractFile $contractFile, Request $request)
+    {
+        abort_unless($contractFile->contract_id === $contract->id, 404);
+
+        $result = $this->service->verifyHash($contractFile, $request);
+
+        [$flashKey, $message] = match ($result) {
+            ContractFileService::VERIFY_MATCHED    => ['success', 'このPDFは保存時から変更されていません。'],
+            ContractFileService::VERIFY_MISMATCHED => ['warning', '警告：PDFファイルが保存時から変更されている可能性があります。'],
+            ContractFileService::VERIFY_MISSING    => ['warning', '警告：PDFファイルが見つかりません。'],
+        };
+
+        return redirect()
+            ->route('contracts.show', $contract)
+            ->with($flashKey, $message);
     }
 }
