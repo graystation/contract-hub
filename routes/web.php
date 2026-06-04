@@ -4,6 +4,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceFileController;
+use App\Http\Controllers\InvoiceMailController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractFileController;
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('invoices.pdf.store');
     Route::get('invoices/{invoice}/files/{invoiceFile}/download', [InvoiceFileController::class, 'download'])
         ->name('invoices.files.download');
+
+    // Invoice mail: send invoice PDF to customer
+    Route::post('invoices/{invoice}/send-mail', [InvoiceMailController::class, 'send'])
+        ->name('invoices.mail.send');
 
     // Payments: nested under invoice for store, standalone for edit/update/destroy
     Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])

@@ -4,6 +4,8 @@ $auditActionLabels = [
     'invoice_updated'                  => '請求書更新',
     'invoice_deleted'                  => '請求書削除',
     'invoice_pdf_generated'            => '請求書PDF生成',
+    'invoice_mail_sent'                => '請求書メール送信',
+    'invoice_mail_failed'              => '請求書メール送信失敗',
     'payment_created'                  => '入金登録',
     'payment_updated'                  => '入金更新',
     'payment_deleted'                  => '入金削除',
@@ -29,6 +31,15 @@ $auditActionLabels = [
                 </h2>
             </div>
             <div class="flex items-center space-x-2">
+                @if ($invoice->project->company->email && $invoice->status !== 'cancelled')
+                    <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}">
+                        @csrf
+                        <button type="submit"
+                                class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                            メール送信
+                        </button>
+                    </form>
+                @endif
                 <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
                     @csrf
                     <button type="submit"
@@ -263,11 +274,61 @@ $auditActionLabels = [
                 @endif
             </div>
 
-            {{-- Section 6: Payments --}}
+            {{-- Section 6: Mail send --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
+                {{ $invoice->project->company->email ? 'border-violet-500' : 'border-gray-300' }}">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">6. 請求書メール送信</h3>
+                </div>
+                <div class="p-6">
+                    @if (! $invoice->project->company->email)
+                        <div class="px-3 py-2 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded text-sm">
+                            ⚠ 顧客のメールアドレスが未登録のため送信できません。
+                            <a href="{{ route('companies.edit', $invoice->project->company) }}"
+                               class="ml-2 text-yellow-900 underline hover:no-underline">顧客情報を更新</a>
+                        </div>
+                    @elseif ($invoice->status === 'cancelled')
+                        <p class="text-sm text-gray-500">キャンセル済みの請求書にはメール送信できません。</p>
+                    @else
+                        <div class="space-y-4">
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">送信先</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        {{ $invoice->project->company->email }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">添付PDF</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        @if ($latestPdf)
+                                            <span class="text-green-700">{{ $latestPdf->file_name }}</span>
+                                        @else
+                                            <span class="text-orange-600">
+                                                PDFが未生成のため、送信時に自動生成します。
+                                            </span>
+                                        @endif
+                                    </dd>
+                                </div>
+                            </dl>
+                            <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}"
+                                  class="pt-3 border-t border-gray-100">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                                    請求書メールを送信する
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Section 7: Payments --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        6. 入金一覧
+                        7. 入金一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoice->payments->count() }} 件</span>
                     </h3>
                 </div>
@@ -358,7 +419,7 @@ $auditActionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        7. 監査ログ
+                        8. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>
@@ -379,8 +440,11 @@ $auditActionLabels = [
                                     <td class="px-6 py-3 whitespace-nowrap text-xs text-gray-700">
                                         {{ $log->created_at->format('Y/m/d H:i:s') }}
                                     </td>
-                                    <td class="px-6 py-3 whitespace-nowrap text-xs text-gray-700">
-                                        {{ $auditActionLabels[$log->action] ?? $log->action }}
+                                    <td class="px-6 py-3 whitespace-nowrap text-xs">
+                                        @php $isWarnLog = str_contains($log->action, 'failed'); @endphp
+                                        <span class="{{ $isWarnLog ? 'text-yellow-700 font-medium' : 'text-gray-700' }}">
+                                            {{ $auditActionLabels[$log->action] ?? $log->action }}
+                                        </span>
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-xs text-gray-500 font-mono">
                                         {{ $log->ip_address ?? '—' }}
