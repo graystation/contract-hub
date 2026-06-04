@@ -14,6 +14,12 @@ $map = [
         'signed'    => ['classes' => 'bg-green-100 text-green-800',  'label' => '締結済'],
         'cancelled' => ['classes' => 'bg-red-100 text-red-800',      'label' => 'キャンセル'],
     ],
+    'invoice' => [
+        'draft'     => ['classes' => 'bg-gray-100 text-gray-800',    'label' => '下書き'],
+        'issued'    => ['classes' => 'bg-blue-100 text-blue-800',    'label' => '請求済'],
+        'paid'      => ['classes' => 'bg-green-100 text-green-800',  'label' => '入金済'],
+        'cancelled' => ['classes' => 'bg-red-100 text-red-800',      'label' => 'キャンセル'],
+    ],
 ];
 
 $config  = $map[$type][$status] ?? ['classes' => 'bg-gray-100 text-gray-800', 'label' => $status];

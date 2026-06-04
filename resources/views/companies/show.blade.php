@@ -71,6 +71,33 @@
                 </div>
             </div>
 
+            {{-- Invoice summary --}}
+            @if ($invoiceSummary['count'] > 0)
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">請求サマリー</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-3 gap-6 text-center">
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wide">請求合計</div>
+                            <div class="mt-1 text-lg font-bold text-gray-900">¥{{ number_format($invoiceSummary['total']) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wide">入金済</div>
+                            <div class="mt-1 text-lg font-bold text-green-700">¥{{ number_format($invoiceSummary['paid']) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wide">未入金</div>
+                            <div class="mt-1 text-lg font-bold {{ $invoiceSummary['unpaid'] > 0 ? 'text-red-600' : 'text-gray-400' }}">
+                                ¥{{ number_format($invoiceSummary['unpaid']) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             {{-- Projects --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">

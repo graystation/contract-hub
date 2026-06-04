@@ -38,7 +38,9 @@ class ProjectController extends Controller
     {
         $project->load('company', 'contracts');
 
-        return view('projects.show', compact('project'));
+        $invoices = $project->invoices()->withSum('payments', 'amount')->get();
+
+        return view('projects.show', compact('project', 'invoices'));
     }
 
     public function edit(Project $project)

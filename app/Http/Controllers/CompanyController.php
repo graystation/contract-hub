@@ -33,9 +33,19 @@ class CompanyController extends Controller
     {
         $company->load([
             'projects' => fn ($q) => $q->withCount('contracts')->orderByDesc('created_at'),
+            'projects.invoices.payments',
         ]);
 
-        return view('companies.show', compact('company'));
+        $allInvoices    = $company->projects->flatMap->invoices;
+        $invoiceSummary = [
+            'total'  => $allInvoices->where('status', '!=', 'cancelled')->sum('total_amount'),
+            'paid'   => $allInvoices->flatMap->payments->sum('amount'),
+            'unpaid' => max(0, $allInvoices->where('status', '!=', 'cancelled')->sum('total_amount')
+                           - $allInvoices->flatMap->payments->sum('amount')),
+            'count'  => $allInvoices->count(),
+        ];
+
+        return view('companies.show', compact('company', 'invoiceSummary'));
     }
 
     public function edit(Company $company)

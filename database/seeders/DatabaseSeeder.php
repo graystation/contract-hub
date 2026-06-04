@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\Contract;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -141,5 +143,70 @@ class DatabaseSeeder extends Seeder
                 'notes'           => '完了済み。',
             ]),
         ];
+
+        // Sample invoices
+        $invoices = [
+            Invoice::create([
+                'project_id'     => $projects[0]->id,
+                'invoice_number' => 'INV-2026-0001',
+                'title'          => '広告掲載料（2026年1月〜3月）',
+                'amount'         => 150000,
+                'tax_amount'     => 15000,
+                'total_amount'   => 165000,
+                'issued_at'      => '2026-01-01',
+                'due_date'       => '2026-01-31',
+                'status'         => 'paid',
+            ]),
+            Invoice::create([
+                'project_id'     => $projects[0]->id,
+                'invoice_number' => 'INV-2026-0002',
+                'title'          => '広告掲載料（2026年4月〜6月）',
+                'amount'         => 150000,
+                'tax_amount'     => 15000,
+                'total_amount'   => 165000,
+                'issued_at'      => '2026-04-01',
+                'due_date'       => '2026-04-30',
+                'status'         => 'issued',
+            ]),
+            Invoice::create([
+                'project_id'     => $projects[2]->id,
+                'invoice_number' => 'INV-2026-0003',
+                'title'          => 'DX推進コンサルティング費（2月分）',
+                'amount'         => 300000,
+                'tax_amount'     => 30000,
+                'total_amount'   => 330000,
+                'issued_at'      => '2026-02-28',
+                'due_date'       => '2026-03-31',
+                'status'         => 'paid',
+            ]),
+            Invoice::create([
+                'project_id'     => $projects[3]->id,
+                'invoice_number' => 'INV-2026-0004',
+                'title'          => 'AI導入支援費（フェーズ1）',
+                'amount'         => 500000,
+                'tax_amount'     => 50000,
+                'total_amount'   => 550000,
+                'issued_at'      => '2026-03-31',
+                'due_date'       => '2026-04-30',
+                'status'         => 'issued',
+            ]),
+            Invoice::create([
+                'project_id'     => $projects[4]->id,
+                'invoice_number' => 'INV-2025-0001',
+                'title'          => 'セキュリティ監査費用',
+                'amount'         => 200000,
+                'tax_amount'     => 20000,
+                'total_amount'   => 220000,
+                'issued_at'      => '2025-12-31',
+                'due_date'       => '2026-01-31',
+                'status'         => 'paid',
+            ]),
+        ];
+
+        // Sample payments
+        Payment::create(['invoice_id' => $invoices[0]->id, 'amount' => 165000, 'paid_at' => '2026-01-25', 'method' => 'bank_transfer', 'memo' => '入金確認済み']);
+        Payment::create(['invoice_id' => $invoices[1]->id, 'amount' => 100000, 'paid_at' => '2026-04-20', 'method' => 'bank_transfer', 'memo' => '一部入金']);
+        Payment::create(['invoice_id' => $invoices[2]->id, 'amount' => 330000, 'paid_at' => '2026-03-28', 'method' => 'bank_transfer']);
+        Payment::create(['invoice_id' => $invoices[4]->id, 'amount' => 220000, 'paid_at' => '2026-01-28', 'method' => 'bank_transfer']);
     }
 }

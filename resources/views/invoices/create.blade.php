@@ -1,0 +1,23 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">請求書作成</h2>
+    </x-slot>
+    <div class="py-8">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <p class="text-xs text-gray-400 mb-4">請求番号：{{ $invoiceNumber }}（自動採番）</p>
+                <form method="POST" action="{{ route('invoices.store') }}">
+                    @csrf
+                    @include('invoices._form')
+                    <div class="mt-6 flex items-center space-x-3">
+                        <button type="submit"
+                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                            作成する
+                        </button>
+                        <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:text-gray-900">キャンセル</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

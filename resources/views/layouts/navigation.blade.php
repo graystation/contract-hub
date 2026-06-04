@@ -24,6 +24,9 @@
                     <x-nav-link :href="route('contracts.index')" :active="request()->routeIs('contracts.*')">
                         契約管理
                     </x-nav-link>
+                    <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*') || request()->routeIs('payments.*')">
+                        請求管理
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -87,6 +90,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('contracts.index')" :active="request()->routeIs('contracts.*')">
                 契約管理
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*') || request()->routeIs('payments.*')">
+                請求管理
             </x-responsive-nav-link>
         </div>
 

@@ -144,6 +144,58 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                 @endif
             </div>
 
+            {{-- Invoices --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        請求一覧
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoices->count() }} 件</span>
+                    </h3>
+                    <a href="{{ route('invoices.create') }}"
+                       class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
+                        + 請求を追加
+                    </a>
+                </div>
+
+                @if ($invoices->isEmpty())
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">請求書が登録されていません。</div>
+                @else
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">請求番号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">税込合計</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">入金済</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ステータス</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach ($invoices as $inv)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-3 whitespace-nowrap">
+                                        <a href="{{ route('invoices.show', $inv) }}"
+                                           class="text-indigo-600 hover:text-indigo-900 font-medium text-sm">
+                                            {{ $inv->invoice_number }}
+                                        </a>
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">{{ $inv->title }}</td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                                        ¥{{ number_format($inv->total_amount) }}
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm text-right text-green-700">
+                                        ¥{{ number_format($inv->payments_sum_amount ?? 0) }}
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap">
+                                        <x-status-badge :status="$inv->status" type="invoice" />
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
+
         </div>
     </div>
 </x-app-layout>

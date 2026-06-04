@@ -37,4 +37,9 @@ class Project extends Model
     {
         return $this->hasMany(Contract::class);
     }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class)->orderByDesc('created_at');
+    }
 }

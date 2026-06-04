@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ConsentController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractFileController;
 use App\Http\Controllers\ContractMailController;
@@ -27,6 +29,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('companies', CompanyController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('contracts', ContractController::class);
+    Route::resource('invoices', InvoiceController::class);
+
+    // Payments: nested under invoice for store, standalone for edit/update/destroy
+    Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])
+        ->name('invoices.payments.store');
+    Route::get('payments/{payment}/edit', [PaymentController::class, 'edit'])
+        ->name('payments.edit');
+    Route::put('payments/{payment}', [PaymentController::class, 'update'])
+        ->name('payments.update');
+    Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])
+        ->name('payments.destroy');
 
     // Contract file: PDF generation, download, and hash verification
     Route::post('contracts/{contract}/pdf', [ContractFileController::class, 'store'])
