@@ -113,10 +113,9 @@ window.__contractProjects__  = @json($projectMap);
                     </select>
                     <button type="button"
                             @click="applyTemplate()"
-                            :disabled="!templateId || loading"
-                            :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
-                            class="px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <span x-text="loading ? '読込中…' : '適用'">適用</span>
+                            :disabled="!templateId"
+                            class="px-4 py-1.5 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed">
+                        適用
                     </button>
                     <a href="{{ route('contract-templates.index') }}" target="_blank"
                        class="text-xs text-gray-400 hover:text-indigo-600">テンプレート管理</a>
