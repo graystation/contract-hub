@@ -110,7 +110,7 @@ $currentBody           = old('body', $contract->body ?? '');
                     </select>
                     <button type="button"
                             @click="applyTemplate()"
-                            :disabled="!templateId || !projectId || loading"
+                            :disabled="!templateId || loading"
                             class="px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed">
                         <span x-show="!loading">適用</span>
                         <span x-show="loading">読込中…</span>
