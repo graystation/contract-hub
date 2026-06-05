@@ -24,6 +24,7 @@ class ContractRequest extends FormRequest
             'signed_at'       => ['nullable', 'date'],
             'status'          => ['required', Rule::in(Contract::STATUSES)],
             'notes'           => ['nullable', 'string'],
+            'body'            => ['nullable', 'string'],
         ];
     }
 }

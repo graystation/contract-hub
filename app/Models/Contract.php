@@ -18,6 +18,7 @@ class Contract extends Model
         'signed_at',
         'status',
         'notes',
+        'body',
         'sign_token',
         'sign_token_expires_at',
         'signer_name',

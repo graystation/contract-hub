@@ -115,6 +115,18 @@ $actionLabels = [
                 </div>
             </div>
 
+            {{-- Contract body --}}
+            @if ($contract->body)
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">契約書本文</h3>
+                </div>
+                <div class="px-6 py-5 prose prose-sm max-w-none">
+                    {!! $contract->body !!}
+                </div>
+            </div>
+            @endif
+
             {{-- Section 2: Related project / customer --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">

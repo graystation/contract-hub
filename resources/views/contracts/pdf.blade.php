@@ -111,6 +111,16 @@
         .status-signed    { background: #d1fae5; color: #065f46; }
         .status-cancelled { background: #fee2e2; color: #991b1b; }
 
+        /* Contract body (rich text from Tiptap) */
+        .contract-body { font-size: 10pt; line-height: 1.8; }
+        .contract-body h2 { font-size: 12pt; font-weight: bold; margin: 10pt 0 4pt; border-bottom: 0.5pt solid #ccc; padding-bottom: 2pt; }
+        .contract-body h3 { font-size: 10.5pt; font-weight: bold; margin: 8pt 0 3pt; }
+        .contract-body p  { margin: 0 0 6pt; }
+        .contract-body ul, .contract-body ol { margin: 4pt 0 6pt 16pt; }
+        .contract-body li { margin-bottom: 2pt; }
+        .contract-body strong { font-weight: bold; }
+        .contract-body u { text-decoration: underline; }
+
         /* Notes box */
         .notes-box {
             background: #fafafa;
@@ -233,6 +243,14 @@
                 </tr>
             </table>
         </div>
+
+        {{-- Contract body --}}
+        @if ($contract->body)
+        <div class="section">
+            <div class="section-title">契約内容</div>
+            <div class="contract-body">{!! $contract->body !!}</div>
+        </div>
+        @endif
 
         {{-- Notes --}}
         @if ($contract->notes)

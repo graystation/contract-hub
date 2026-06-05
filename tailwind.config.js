@@ -1,5 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -29,5 +30,5 @@ export default {
         'text-emerald-600', 'hover:text-emerald-800',
     ],
 
-    plugins: [forms],
+    plugins: [forms, typography],
 };

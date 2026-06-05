@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContractRequest;
 use App\Models\Contract;
+use App\Models\ContractTemplate;
 use App\Models\Project;
 use App\Services\ContractFileService;
 use App\Services\ContractService;
@@ -25,9 +26,10 @@ class ContractController extends Controller
     public function create()
     {
         return view('contracts.create', [
-            'projects'        => Project::with('company')->orderByDesc('created_at')->get(),
-            'statuses'        => Contract::STATUSES,
-            'contractNumber'  => $this->service->generateContractNumber(),
+            'projects'       => Project::with('company')->orderByDesc('created_at')->get(),
+            'statuses'       => Contract::STATUSES,
+            'contractNumber' => $this->service->generateContractNumber(),
+            'templates'      => ContractTemplate::orderBy('title')->get(),
         ]);
     }
 
@@ -51,9 +53,10 @@ class ContractController extends Controller
     public function edit(Contract $contract)
     {
         return view('contracts.edit', [
-            'contract' => $contract,
-            'projects' => Project::with('company')->orderByDesc('created_at')->get(),
-            'statuses' => Contract::STATUSES,
+            'contract'  => $contract,
+            'projects'  => Project::with('company')->orderByDesc('created_at')->get(),
+            'statuses'  => Contract::STATUSES,
+            'templates' => ContractTemplate::orderBy('title')->get(),
         ]);
     }
 

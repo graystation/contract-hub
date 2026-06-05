@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ContractTemplateController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceFileController;
@@ -29,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('companies', CompanyController::class);
+    Route::resource('contract-templates', ContractTemplateController::class)->except(['show']);
+    Route::get('contract-templates/{contractTemplate}/preview', [ContractTemplateController::class, 'preview'])
+        ->name('contract-templates.preview');
     Route::resource('projects', ProjectController::class);
     Route::resource('contracts', ContractController::class);
     Route::resource('invoices', InvoiceController::class);

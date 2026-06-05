@@ -21,8 +21,11 @@
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
                         案件管理
                     </x-nav-link>
-                    <x-nav-link :href="route('contracts.index')" :active="request()->routeIs('contracts.*')">
+                    <x-nav-link :href="route('contracts.index')" :active="request()->routeIs('contracts.*') && !request()->routeIs('contract-templates.*')">
                         契約管理
+                    </x-nav-link>
+                    <x-nav-link :href="route('contract-templates.index')" :active="request()->routeIs('contract-templates.*')">
+                        契約書テンプレート
                     </x-nav-link>
                     <x-nav-link :href="route('invoices.index')" :active="request()->routeIs('invoices.*') || request()->routeIs('payments.*')">
                         請求管理
