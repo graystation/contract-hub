@@ -353,6 +353,7 @@ $actionLabels = [
                 @if ($contract->files->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">ファイルがありません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -391,6 +392,7 @@ $actionLabels = [
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 
@@ -406,6 +408,7 @@ $actionLabels = [
                 @if ($auditLogs->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">ログがありません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -437,6 +440,7 @@ $actionLabels = [
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 

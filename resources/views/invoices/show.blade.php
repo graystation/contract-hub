@@ -237,6 +237,7 @@ $auditActionLabels = [
                 @if ($invoice->files->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">ファイルがありません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -271,6 +272,7 @@ $auditActionLabels = [
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 
@@ -336,6 +338,7 @@ $auditActionLabels = [
                 @if ($invoice->payments->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">入金が登録されていません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -373,6 +376,7 @@ $auditActionLabels = [
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
 
                 {{-- Payment registration form --}}
@@ -426,6 +430,7 @@ $auditActionLabels = [
                 @if ($auditLogs->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">ログがありません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -453,6 +458,7 @@ $auditActionLabels = [
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 

@@ -105,6 +105,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                         契約が登録されていません。
                     </div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -141,6 +142,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 
@@ -160,6 +162,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                 @if ($invoices->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">請求書が登録されていません。</div>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -193,6 +196,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                             @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow-x-auto --}}
                 @endif
             </div>
 
