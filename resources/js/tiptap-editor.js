@@ -69,7 +69,6 @@ window.contractForm = (config = {}) => ({
     applyTemplate() {
         if (!this.templateId) return;
 
-        // Template bodies are embedded in the page — no AJAX needed
         const templateMap = window.__contractTemplates__ || {};
         const projectMap  = window.__contractProjects__  || {};
 
@@ -177,9 +176,14 @@ window.tiptapEditor = (config = {}) => ({
 
     /** Load HTML from outside (template injection). */
     loadHtml(html) {
-        this.editor?.commands.setContent(html || '', true);
-        const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
-        if (hiddenEl) hiddenEl.value = html || '';
-        this.content = html || '';
+        // Defer to avoid ProseMirror "mismatched transaction" error
+        // when setContent is called inside an event handler
+        setTimeout(() => {
+            if (!this.editor) return;
+            this.editor.commands.setContent(html || '', true);
+            const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
+            if (hiddenEl) hiddenEl.value = html || '';
+            this.content = html || '';
+        }, 0);
     },
 });
