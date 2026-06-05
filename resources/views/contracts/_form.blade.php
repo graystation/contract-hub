@@ -4,7 +4,30 @@ $currentProjectId      = old('project_id', $contract->project_id ?? '');
 $currentContractNumber = old('contract_number', $contract->contract_number ?? $contractNumber ?? '');
 $currentContractType   = old('contract_type', $contract->contract_type ?? '');
 $currentBody           = old('body', $contract->body ?? '');
+
+// Build project map for client-side variable substitution
+$projectMap = [];
+foreach (($projects ?? []) as $p) {
+    $projectMap[$p->id] = [
+        'company_name'  => $p->company->company_name ?? '',
+        'contact_name'  => $p->company->contact_name ?? '',
+        'project_title' => $p->title ?? '',
+        'start_date'    => $p->started_at?->format('Y年m月d日') ?? '',
+        'end_date'      => $p->ended_at?->format('Y年m月d日') ?? '',
+    ];
+}
+
+// Build template map for client-side loading
+$templateMap = [];
+foreach (($templates ?? []) as $t) {
+    $templateMap[$t->id] = $t->body;
+}
 @endphp
+
+<script>
+window.__contractTemplates__ = @json($templateMap);
+window.__contractProjects__  = @json($projectMap);
+</script>
 
 <div
     x-data="contractForm({

@@ -65,26 +65,41 @@ window.contractForm = (config = {}) => ({
     contractNumber: config.contractNumber || '',
     contractType:   config.contractType   || '',
     templateId:     '',
-    loading:        false,
 
     applyTemplate() {
         if (!this.templateId) return;
-        this.loading = true;
 
-        const url = '/contract-templates/' + this.templateId + '/preview'
-            + '?project_id='      + encodeURIComponent(this.projectId)
-            + '&contract_number=' + encodeURIComponent(this.contractNumber)
-            + '&contract_type='   + encodeURIComponent(this.contractType);
+        // Template bodies are embedded in the page — no AJAX needed
+        const templateMap = window.__contractTemplates__ || {};
+        const projectMap  = window.__contractProjects__  || {};
 
-        fetch(url, { credentials: 'same-origin' })
-            .then(r => r.json())
-            .then(data => {
-                window.dispatchEvent(new CustomEvent('load-html', {
-                    detail: { target: 'body', html: data.body },
-                }));
-            })
-            .catch(err => console.error('Template fetch error:', err))
-            .finally(() => { this.loading = false; });
+        let body = templateMap[this.templateId] || '';
+        if (!body) return;
+
+        // Client-side variable substitution
+        const proj    = projectMap[this.projectId] || {};
+        const today   = new Date().toLocaleDateString('ja-JP', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        const vars = {
+            '{company_name}'    : proj.company_name   || '',
+            '{contact_name}'    : proj.contact_name   || '',
+            '{project_title}'   : proj.project_title  || '',
+            '{start_date}'      : proj.start_date     || '',
+            '{end_date}'        : proj.end_date       || '',
+            '{contract_number}' : this.contractNumber || '（採番前）',
+            '{contract_type}'   : this.contractType   || '',
+            '{today}'           : today,
+        };
+
+        Object.entries(vars).forEach(([key, val]) => {
+            body = body.replaceAll(key, val);
+        });
+
+        window.dispatchEvent(new CustomEvent('load-html', {
+            detail: { target: 'body', html: body },
+        }));
     },
 });
 
