@@ -23,7 +23,8 @@ window.tiptapEditor = (config = {}) => ({
             content: this.content || null,
             editorProps: {
                 attributes: {
-                    class: 'prose prose-sm max-w-none min-h-[800px] px-4 py-3 focus:outline-none',
+                    class: 'prose prose-sm max-w-none px-4 py-3 focus:outline-none',
+                    style: 'min-height: 800px',
                 },
             },
             onUpdate: ({ editor }) => {
