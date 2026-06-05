@@ -21,11 +21,14 @@ $currentBody           = old('body', $contract->body ?? '');
                 + `?project_id=${this.projectId}`
                 + `&contract_number=${encodeURIComponent(this.contractNumber)}`
                 + `&contract_type=${encodeURIComponent(this.contractType)}`;
-            fetch(url)
+            fetch(url, { credentials: 'same-origin' })
                 .then(r => r.json())
                 .then(data => {
-                    this.$dispatch('load-html', { target: 'body', html: data.body });
+                    window.dispatchEvent(new CustomEvent('load-html', {
+                        detail: { target: 'body', html: data.body }
+                    }));
                 })
+                .catch(err => console.error('Template fetch error:', err))
                 .finally(() => { this.loading = false; });
         }
     }"
