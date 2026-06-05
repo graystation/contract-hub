@@ -7,31 +7,11 @@ $currentBody           = old('body', $contract->body ?? '');
 @endphp
 
 <div
-    x-data="{
-        projectId:      '{{ $currentProjectId }}',
+    x-data="contractForm({
+        projectId:      {{ Js::from($currentProjectId) }},
         contractNumber: {{ Js::from($currentContractNumber) }},
-        contractType:   {{ Js::from($currentContractType) }},
-        templateId:     '',
-        loading:        false,
-
-        applyTemplate() {
-            if (!this.templateId || !this.projectId) return;
-            this.loading = true;
-            const url = `/contract-templates/${this.templateId}/preview`
-                + `?project_id=${this.projectId}`
-                + `&contract_number=${encodeURIComponent(this.contractNumber)}`
-                + `&contract_type=${encodeURIComponent(this.contractType)}`;
-            fetch(url, { credentials: 'same-origin' })
-                .then(r => r.json())
-                .then(data => {
-                    window.dispatchEvent(new CustomEvent('load-html', {
-                        detail: { target: 'body', html: data.body }
-                    }));
-                })
-                .catch(err => console.error('Template fetch error:', err))
-                .finally(() => { this.loading = false; });
-        }
-    }"
+        contractType:   {{ Js::from($currentContractType) }}
+    })"
     class="space-y-5"
 >
     {{-- Project --}}
