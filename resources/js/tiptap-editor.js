@@ -1,9 +1,63 @@
-import { Editor } from '@tiptap/core';
+import { Editor, Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
 
 /**
- * Alpine.js component for Tiptap rich-text editor.
+ * Simple indent/outdent extension using margin-left on block nodes.
+ * Tab = indent, Shift-Tab = outdent.
+ */
+const Indent = Extension.create({
+    name: 'indent',
+
+    addOptions() {
+        return { step: 24, maxLevel: 8 };
+    },
+
+    addGlobalAttributes() {
+        return [{
+            types: ['paragraph', 'heading'],
+            attributes: {
+                indent: {
+                    default: 0,
+                    parseHTML: el => Math.round((parseInt(el.style.marginLeft) || 0) / this.options.step),
+                    renderHTML: attrs => attrs.indent > 0
+                        ? { style: `margin-left: ${attrs.indent * this.options.step}px` }
+                        : {},
+                },
+            },
+        }];
+    },
+
+    addCommands() {
+        return {
+            indent: () => ({ state, commands }) => {
+                const node = state.selection.$head.parent;
+                const current = node.attrs.indent ?? 0;
+                return commands.updateAttributes(node.type.name, {
+                    indent: Math.min(current + 1, this.options.maxLevel),
+                });
+            },
+            outdent: () => ({ state, commands }) => {
+                const node = state.selection.$head.parent;
+                const current = node.attrs.indent ?? 0;
+                return commands.updateAttributes(node.type.name, {
+                    indent: Math.max(current - 1, 0),
+                });
+            },
+        };
+    },
+
+    addKeyboardShortcuts() {
+        return {
+            Tab:       () => this.editor.commands.indent(),
+            'Shift-Tab': () => this.editor.commands.outdent(),
+        };
+    },
+});
+
+/**
+ * Alpine.js component for the Tiptap rich-text editor.
  * Usage: x-data="tiptapEditor({ content: '...' })"
  */
 window.tiptapEditor = (config = {}) => ({
@@ -11,14 +65,16 @@ window.tiptapEditor = (config = {}) => ({
     content: config.content || '',
 
     init() {
-        const editorEl  = this.$el.querySelector('[data-tiptap]');
-        const hiddenEl  = this.$el.querySelector('[data-tiptap-value]');
+        const editorEl = this.$el.querySelector('[data-tiptap]');
+        const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
 
         this.editor = new Editor({
             element: editorEl,
             extensions: [
                 StarterKit.configure({ heading: { levels: [2, 3] } }),
                 Underline,
+                TextAlign.configure({ types: ['heading', 'paragraph'] }),
+                Indent,
             ],
             content: this.content || null,
             editorProps: {
@@ -41,17 +97,38 @@ window.tiptapEditor = (config = {}) => ({
         this.editor?.destroy();
     },
 
-    // Toolbar helpers
-    isActive(type, attrs)  { return this.editor?.isActive(type, attrs ?? {}) ?? false; },
-    toggleBold()           { this.editor?.chain().focus().toggleBold().run(); },
-    toggleUnderline()      { this.editor?.chain().focus().toggleUnderline().run(); },
-    toggleH2()             { this.editor?.chain().focus().toggleHeading({ level: 2 }).run(); },
-    toggleH3()             { this.editor?.chain().focus().toggleHeading({ level: 3 }).run(); },
-    toggleBullet()         { this.editor?.chain().focus().toggleBulletList().run(); },
-    toggleOrdered()        { this.editor?.chain().focus().toggleOrderedList().run(); },
-    clearFormat()          { this.editor?.chain().focus().clearNodes().unsetAllMarks().run(); },
+    // ── State helpers ──────────────────────────────────────────
+    isActive(type, attrs) { return this.editor?.isActive(type, attrs ?? {}) ?? false; },
 
-    /** Replace editor content from outside (e.g. template load). */
+    // ── Block format ───────────────────────────────────────────
+    toggleH2()      { this.editor?.chain().focus().toggleHeading({ level: 2 }).run(); },
+    toggleH3()      { this.editor?.chain().focus().toggleHeading({ level: 3 }).run(); },
+
+    // ── Inline format ──────────────────────────────────────────
+    toggleBold()      { this.editor?.chain().focus().toggleBold().run(); },
+    toggleItalic()    { this.editor?.chain().focus().toggleItalic().run(); },
+    toggleUnderline() { this.editor?.chain().focus().toggleUnderline().run(); },
+
+    // ── Alignment ──────────────────────────────────────────────
+    alignLeft()   { this.editor?.chain().focus().setTextAlign('left').run(); },
+    alignCenter() { this.editor?.chain().focus().setTextAlign('center').run(); },
+    alignRight()  { this.editor?.chain().focus().setTextAlign('right').run(); },
+
+    // ── Lists ──────────────────────────────────────────────────
+    toggleBullet()  { this.editor?.chain().focus().toggleBulletList().run(); },
+    toggleOrdered() { this.editor?.chain().focus().toggleOrderedList().run(); },
+
+    // ── Indent ─────────────────────────────────────────────────
+    indent()  { this.editor?.chain().focus().indent().run(); },
+    outdent() { this.editor?.chain().focus().outdent().run(); },
+
+    // ── Insert ─────────────────────────────────────────────────
+    insertHr() { this.editor?.chain().focus().setHorizontalRule().run(); },
+
+    // ── Misc ───────────────────────────────────────────────────
+    clearFormat() { this.editor?.chain().focus().clearNodes().unsetAllMarks().run(); },
+
+    /** Load HTML from outside (template injection). */
     loadHtml(html) {
         this.editor?.commands.setContent(html || '', true);
         const hiddenEl = this.$el.querySelector('[data-tiptap-value]');

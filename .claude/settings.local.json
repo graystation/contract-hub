@@ -25,7 +25,8 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(npm run *)",
-      "Bash(php *)"
+      "Bash(php *)",
+      "Bash(npm install *)"
     ]
   }
 }
