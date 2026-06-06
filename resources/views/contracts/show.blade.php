@@ -10,6 +10,7 @@ $actionLabels = [
     'contract_sign_request_mail_failed'              => '同意依頼メール送信失敗',
     'contract_signed_notification_mail_sent'         => '締結完了通知メール送信',
     'contract_signed_notification_mail_failed'       => '締結完了通知メール送信失敗',
+    'contract_evidence_export_generated'             => '証跡ZIP生成',
 ];
 @endphp
 
@@ -408,11 +409,74 @@ $actionLabels = [
                 @endif
             </div>
 
-            {{-- Section 6: Audit logs --}}
+            {{-- Section 6: Evidence exports --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        6. 証跡エクスポート
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $evidenceExports->count() }} 件</span>
+                    </h3>
+                    <form method="POST" action="{{ route('contracts.evidence-exports.store', $contract) }}">
+                        @csrf
+                        <button type="submit"
+                                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                            + 証跡ZIPを生成
+                        </button>
+                    </form>
+                </div>
+
+                <div class="px-6 py-4 bg-blue-50 border-b border-blue-100 text-xs text-blue-700">
+                    このZIPには契約PDF、監査ログ、メタデータ、ハッシュ情報が含まれます。
+                    データベース障害時や第三者説明時に備え、必要に応じて外部保存してください。
+                </div>
+
+                @if ($evidenceExports->isEmpty())
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">
+                        証跡ZIPが生成されていません。「証跡ZIPを生成」から作成してください。
+                    </div>
+                @else
+                    <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ファイル名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">生成日時</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SHA256（先頭16字）</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach ($evidenceExports as $export)
+                                <tr class="hover:bg-gray-50 {{ $latestEvidenceExport && $export->id === $latestEvidenceExport->id ? 'bg-indigo-50' : '' }}">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
+                                        {{ $export->file_name }}
+                                        @if ($latestEvidenceExport && $export->id === $latestEvidenceExport->id)
+                                            <span class="ml-2 text-xs text-indigo-600 font-sans font-medium">最新</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        {{ $export->generated_at?->format('Y/m/d H:i') ?? $export->created_at->format('Y/m/d H:i') }}
+                                    </td>
+                                    <td class="px-6 py-4 text-xs text-gray-400 font-mono" title="{{ $export->file_hash }}">
+                                        {{ $export->file_hash ? substr($export->file_hash, 0, 16) . '…' : '—' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="{{ route('contracts.evidence-exports.download', [$contract, $export]) }}"
+                                           class="text-indigo-600 hover:text-indigo-900">ダウンロード</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    </div>{{-- overflow-x-auto --}}
+                @endif
+            </div>
+
+            {{-- Section 7: Audit logs --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        6. 監査ログ
+                        7. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>

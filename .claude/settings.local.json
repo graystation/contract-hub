@@ -26,7 +26,18 @@
       "Bash(git push *)",
       "Bash(npm run *)",
       "Bash(php *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(rm -f /tmp/cj.txt)",
+      "Read(//tmp/**)",
+      "Bash(kill %1)",
+      "Read(//System/Library/Fonts/Supplemental/**)",
+      "Read(//Library/Fonts/**)",
+      "Bash(rsync -a \"/Library/Fonts/Arial Unicode.ttf\" /Users/kei/contract-hub/storage/fonts/ArialUnicode.ttf)",
+      "Bash(open *)",
+      "Bash(python3 -c \"from fontTools.ttLib import TTCollection; print\\('fonttools OK'\\)\")",
+      "Read(//System/Library/Fonts/**)",
+      "Bash(python3 *)",
+      "Bash(brew install *)"
     ]
   }
 }

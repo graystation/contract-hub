@@ -8,6 +8,7 @@ use App\Http\Controllers\InvoiceFileController;
 use App\Http\Controllers\InvoiceMailController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ContractEvidenceExportController;
 use App\Http\Controllers\ContractFileController;
 use App\Http\Controllers\ContractMailController;
 use App\Http\Controllers\ContractSigningController;
@@ -56,6 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('payments.update');
     Route::delete('payments/{payment}', [PaymentController::class, 'destroy'])
         ->name('payments.destroy');
+
+    // Contract evidence exports: ZIP generation and download
+    Route::post('contracts/{contract}/evidence-exports', [ContractEvidenceExportController::class, 'store'])
+        ->name('contracts.evidence-exports.store');
+    Route::get('contracts/{contract}/evidence-exports/{export}/download', [ContractEvidenceExportController::class, 'download'])
+        ->name('contracts.evidence-exports.download');
 
     // Contract file: PDF generation, download, and hash verification
     Route::post('contracts/{contract}/pdf', [ContractFileController::class, 'store'])

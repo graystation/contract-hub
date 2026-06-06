@@ -22,7 +22,9 @@
 /storage/pail
 /storage/app/contracts/*.pdf
 /storage/app/invoices/*.pdf
+/storage/app/contract-evidence/*.zip
 /storage/backups/
+/storage/fonts/*.ttf
 /vendor
 _ide_helper.php
 Homestead.json

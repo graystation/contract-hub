@@ -43,4 +43,9 @@ class Contract extends Model
     {
         return $this->hasMany(ContractFile::class)->orderByDesc('created_at');
     }
+
+    public function evidenceExports(): HasMany
+    {
+        return $this->hasMany(ContractEvidenceExport::class)->orderByDesc('created_at');
+    }
 }

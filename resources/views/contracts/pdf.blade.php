@@ -5,15 +5,19 @@
     <title>契約書 - {{ $contract->contract_number }}</title>
     <style>
         /*
-         * Japanese font via @font-face.
-         * On macOS, Arial Unicode MS is available at /Library/Fonts/Arial Unicode.ttf.
-         * On a Linux server, replace this path with the location of your Japanese TTF font
-         * (e.g. /usr/share/fonts/truetype/fonts-japanese-gothic.ttf or IPAexGothic).
+         * Japanese font — IPAex明朝 (TrueType, IPA license).
+         * Pre-registered in storage/fonts/installed-fonts.json.
          */
         @font-face {
-            font-family: 'JapaneseFont';
-            src: url('/Library/Fonts/Arial Unicode.ttf');
+            font-family: 'IPAexMincho';
+            src: url('file://{{ storage_path('fonts/ipaexm.ttf') }}');
             font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'IPAexMincho';
+            src: url('file://{{ storage_path('fonts/ipaexm.ttf') }}');
+            font-weight: bold;
             font-style: normal;
         }
 
@@ -24,11 +28,13 @@
         }
 
         body {
-            font-family: 'JapaneseFont', 'DejaVu Sans', sans-serif;
+            font-family: 'IPAexMincho', 'DejaVu Sans', serif;
             font-size: 11pt;
             color: #222;
             background: #fff;
             line-height: 1.7;
+            word-break: break-all;
+            overflow-wrap: break-word;
         }
 
         .page {

@@ -5,24 +5,32 @@
     <title>請求書 - {{ $invoice->invoice_number }}</title>
     <style>
         /*
-         * Japanese font — Arial Unicode MS (macOS: /Library/Fonts/Arial Unicode.ttf).
-         * On a Linux server, replace with an installed Japanese TTF such as IPAexGothic.
+         * Japanese font — IPAex明朝 (TrueType, IPA license).
+         * Pre-registered in storage/fonts/installed-fonts.json.
          */
         @font-face {
-            font-family: 'JapaneseFont';
-            src: url('/Library/Fonts/Arial Unicode.ttf');
+            font-family: 'IPAexMincho';
+            src: url('file://{{ storage_path('fonts/ipaexm.ttf') }}');
             font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'IPAexMincho';
+            src: url('file://{{ storage_path('fonts/ipaexm.ttf') }}');
+            font-weight: bold;
             font-style: normal;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'JapaneseFont', 'DejaVu Sans', sans-serif;
+            font-family: 'IPAexMincho', 'DejaVu Sans', serif;
             font-size: 10.5pt;
             color: #222;
             background: #fff;
             line-height: 1.65;
+            word-break: break-all;
+            overflow-wrap: break-word;
         }
 
         .page { padding: 20mm 18mm 20mm 20mm; }
