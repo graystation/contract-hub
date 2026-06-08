@@ -56,7 +56,12 @@
       "Bash(pdfinfo restored_test.pdf)",
       "Bash(pdftoppm -png -f 1 -l 2 -r 90 restored_test.pdf restored_p)",
       "Bash(npx --version)",
-      "Bash(composer show *)"
+      "Bash(composer show *)",
+      "Read(//Users/kei/clinic-tech-lab/resources/views/**)",
+      "Read(//Users/kei/clinic-tech-lab/resources/js/**)",
+      "Read(//Users/kei/clinic-tech-lab/resources/**)",
+      "Bash(grep -o \"insertContent\\(.\\\\{1,30\\\\}\\)\" /Users/kei/contract-hub/public/build/assets/app-BOM3Apen.js)",
+      "Bash(node *)"
     ]
   }
 }

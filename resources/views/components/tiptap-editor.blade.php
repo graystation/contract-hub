@@ -2,7 +2,7 @@
 
 <div
     x-data="tiptapEditor({ content: {{ Js::from($value) }} })"
-    x-init="init()"
+    x-init="setup()"
     @load-html.window="if ($event.detail.target === '{{ $name }}') loadHtml($event.detail.html)"
     class="border border-gray-300 rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500"
 >

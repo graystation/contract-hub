@@ -117,81 +117,93 @@ window.contractForm = (config = {}) => ({
 
 // ---------------------------------------------------------------------------
 // Alpine.js: tiptapEditor — rich text editor component
+//
+// The Tiptap Editor instance is kept in a closure variable (not in Alpine's
+// reactive data) to prevent Alpine's Proxy from wrapping ProseMirror's
+// internal objects, which causes "mismatched transaction" errors.
 // ---------------------------------------------------------------------------
-window.tiptapEditor = (config = {}) => ({
-    editor:  null,
-    content: config.content || '',
+window.tiptapEditor = (config = {}) => {
+    let editor = null;
 
-    init() {
-        const editorEl = this.$el.querySelector('[data-tiptap]');
-        const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
+    return {
+        content: config.content || '',
 
-        this.editor = createEditor(editorEl, this.content, ({ editor }) => {
-            const html = editor.getHTML();
-            if (hiddenEl) hiddenEl.value = html;
-            this.content = html;
-        });
+        setup() {
+            const editorEl = this.$el.querySelector('[data-tiptap]');
+            const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
+            if (!editorEl) return;
 
-        if (hiddenEl) hiddenEl.value = this.content;
-    },
+            editor = createEditor(editorEl, this.content, ({ editor: e }) => {
+                const html = e.getHTML();
+                if (hiddenEl) hiddenEl.value = html;
+                this.content = html;
+            });
 
-    destroy() {
-        this.editor?.destroy();
-    },
+            if (hiddenEl) hiddenEl.value = this.content;
+            window._tiptapEditor = this;
+        },
 
-    /**
-     * Load new HTML by destroying and recreating the editor.
-     * This avoids ProseMirror "mismatched transaction" errors that occur
-     * when setContent() is called inside an event dispatch cycle.
-     */
-    loadHtml(html) {
-        const editorEl = this.$el.querySelector('[data-tiptap]');
-        const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
+        destroy() {
+            editor?.destroy();
+            editor = null;
+        },
 
-        if (this.editor) {
-            this.editor.destroy();
-            if (editorEl) editorEl.innerHTML = '';
-        }
+        /**
+         * Load new HTML by destroying and recreating the editor.
+         * Avoids ProseMirror "mismatched transaction" errors that occur
+         * when setContent() is called inside an event dispatch cycle.
+         */
+        loadHtml(html) {
+            const editorEl = this.$el.querySelector('[data-tiptap]');
+            const hiddenEl = this.$el.querySelector('[data-tiptap-value]');
 
-        this.content = html || '';
+            if (editor) {
+                editor.destroy();
+                editor = null;
+                if (editorEl) editorEl.innerHTML = '';
+            }
 
-        this.editor = createEditor(editorEl, html, ({ editor }) => {
-            const h = editor.getHTML();
-            if (hiddenEl) hiddenEl.value = h;
-            this.content = h;
-        });
+            this.content = html || '';
 
-        if (hiddenEl) hiddenEl.value = html || '';
-    },
+            editor = createEditor(editorEl, html, ({ editor: e }) => {
+                const h = e.getHTML();
+                if (hiddenEl) hiddenEl.value = h;
+                this.content = h;
+            });
 
-    // ── State ────────────────────────────────────────────────────────────
-    isActive(type, attrs) { return this.editor?.isActive(type, attrs ?? {}) ?? false; },
+            if (hiddenEl) hiddenEl.value = html || '';
+        },
 
-    // ── Block ────────────────────────────────────────────────────────────
-    toggleH2()      { this.editor?.chain().focus().toggleHeading({ level: 2 }).run(); },
-    toggleH3()      { this.editor?.chain().focus().toggleHeading({ level: 3 }).run(); },
+        // ── State ────────────────────────────────────────────────────────────
+        isActive(type, attrs) { return editor?.isActive(type, attrs ?? {}) ?? false; },
 
-    // ── Inline ───────────────────────────────────────────────────────────
-    toggleBold()      { this.editor?.chain().focus().toggleBold().run(); },
-    toggleItalic()    { this.editor?.chain().focus().toggleItalic().run(); },
-    toggleUnderline() { this.editor?.chain().focus().toggleUnderline().run(); },
+        // ── Block ────────────────────────────────────────────────────────────
+        toggleH2()      { editor?.chain().focus().toggleHeading({ level: 2 }).run(); },
+        toggleH3()      { editor?.chain().focus().toggleHeading({ level: 3 }).run(); },
 
-    // ── Alignment ────────────────────────────────────────────────────────
-    alignLeft()   { this.editor?.chain().focus().setTextAlign('left').run(); },
-    alignCenter() { this.editor?.chain().focus().setTextAlign('center').run(); },
-    alignRight()  { this.editor?.chain().focus().setTextAlign('right').run(); },
+        // ── Inline ───────────────────────────────────────────────────────────
+        toggleBold()      { editor?.chain().focus().toggleBold().run(); },
+        toggleItalic()    { editor?.chain().focus().toggleItalic().run(); },
+        toggleUnderline() { editor?.chain().focus().toggleUnderline().run(); },
 
-    // ── Lists ────────────────────────────────────────────────────────────
-    toggleBullet()  { this.editor?.chain().focus().toggleBulletList().run(); },
-    toggleOrdered() { this.editor?.chain().focus().toggleOrderedList().run(); },
+        // ── Alignment ────────────────────────────────────────────────────────
+        alignLeft()   { editor?.chain().focus().setTextAlign('left').run(); },
+        alignCenter() { editor?.chain().focus().setTextAlign('center').run(); },
+        alignRight()  { editor?.chain().focus().setTextAlign('right').run(); },
 
-    // ── Indent ───────────────────────────────────────────────────────────
-    indent()  { this.editor?.chain().focus().indent().run(); },
-    outdent() { this.editor?.chain().focus().outdent().run(); },
+        // ── Lists ────────────────────────────────────────────────────────────
+        toggleBullet()  { editor?.chain().focus().toggleBulletList().run(); },
+        toggleOrdered() { editor?.chain().focus().toggleOrderedList().run(); },
 
-    // ── Insert ───────────────────────────────────────────────────────────
-    insertHr() { this.editor?.chain().focus().setHorizontalRule().run(); },
+        // ── Indent ───────────────────────────────────────────────────────────
+        indent()  { editor?.chain().focus().indent().run(); },
+        outdent() { editor?.chain().focus().outdent().run(); },
 
-    // ── Misc ─────────────────────────────────────────────────────────────
-    clearFormat() { this.editor?.chain().focus().clearNodes().unsetAllMarks().run(); },
-});
+        // ── Insert ───────────────────────────────────────────────────────────
+        insertHr()       { editor?.chain().focus().setHorizontalRule().run(); },
+        insertText(text) { editor?.chain().focus().insertContent(text).run(); },
+
+        // ── Misc ─────────────────────────────────────────────────────────────
+        clearFormat() { editor?.chain().focus().clearNodes().unsetAllMarks().run(); },
+    };
+};
