@@ -37,7 +37,26 @@
       "Bash(python3 -c \"from fontTools.ttLib import TTCollection; print\\('fonttools OK'\\)\")",
       "Read(//System/Library/Fonts/**)",
       "Bash(python3 *)",
-      "Bash(brew install *)"
+      "Bash(brew install *)",
+      "Bash(/bin/cp /tmp/test-contract2.pdf /Users/kei/Desktop/CTR-2026-0003_margin-fixed.pdf)",
+      "Bash(/usr/bin/open /Users/kei/Desktop/CTR-2026-0003_margin-fixed.pdf)",
+      "Bash(pdfinfo margin_test.pdf)",
+      "Bash(pdftoppm -png -f 2 -l 2 -r 100 margin_test.pdf margintest_p2)",
+      "Bash(pdftoppm -png -f 1 -l 3 -r 80 margin_test.pdf margintest_all)",
+      "Bash(pdftoppm -png -f 2 -l 2 -r 90 margin_test2.pdf m2p2)",
+      "Bash(pdftoppm -png -f 1 -l 1 -r 90 margin_test2.pdf m2p1)",
+      "Bash(pdftoppm -png -f 1 -l 1 -r 90 margin_test4.pdf m4p1)",
+      "Bash(pdftotext margin_test4.pdf -)",
+      "Bash(pdftoppm -png -f 2 -l 2 -r 90 at_page_test.pdf atpage_p2)",
+      "Bash(grep -n \"</div>\\\\s*$\\\\|</body>\\\\|</html>\" /Users/kei/contract-hub/resources/views/contracts/pdf.blade.php)",
+      "Bash(pdfinfo thead_test.pdf)",
+      "Bash(pdftoppm -png -f 1 -l 1 -r 90 thead_test.pdf thead_p1)",
+      "Bash(pdftoppm -png -f 2 -l 2 -r 90 thead_test.pdf thead_p2)",
+      "Bash(pdftoppm -png -f 3 -l 3 -r 90 thead_test.pdf thead_p3)",
+      "Bash(pdfinfo restored_test.pdf)",
+      "Bash(pdftoppm -png -f 1 -l 2 -r 90 restored_test.pdf restored_p)",
+      "Bash(npx --version)",
+      "Bash(composer show *)"
     ]
   }
 }

@@ -21,6 +21,19 @@
             font-style: normal;
         }
 
+        /*
+         * dompdf only honors @page margin-top on the first page, not on
+         * continuation pages. A fixed-position spacer (same mechanism as
+         * the footer) reserves top space on every page instead.
+         */
+        .top-spacer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 25mm;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -33,7 +46,7 @@
             overflow-wrap: break-word;
         }
 
-        .page { padding: 20mm 18mm 20mm 20mm; }
+        .page { padding: 0 18mm 20mm 20mm; }
 
         /* ---- Header ---- */
         .doc-header {
@@ -129,7 +142,7 @@
             white-space: pre-wrap;
         }
 
-        /* ---- Footer ---- */
+        /* ---- Footer — repeated on every page via position:fixed ---- */
         .footer {
             position: fixed;
             bottom: 8mm;
@@ -139,8 +152,12 @@
             padding-top: 3pt;
             font-size: 7.5pt;
             color: #bbb;
-            text-align: right;
         }
+        .footer table { width: 100%; border-collapse: collapse; }
+        .footer td { padding: 0; vertical-align: top; }
+        .footer .f-left  { text-align: left; }
+        .footer .f-right { text-align: right; }
+        .page-num:before { content: "- " counter(page) " -"; }
         .generated-at {
             font-size: 7.5pt;
             color: #bbb;
@@ -150,9 +167,13 @@
     </style>
 </head>
 <body>
+    <div class="top-spacer"></div>
+
     <div class="footer">
-        {{ $invoice->invoice_number }} &nbsp;|&nbsp;
-        生成日時：{{ now()->format('Y年m月d日 H:i') }}
+        <table><tr>
+            <td class="f-left"><span class="page-num"></span></td>
+            <td class="f-right">{{ $invoice->invoice_number }} &nbsp;|&nbsp; 生成日時：{{ now()->format('Y年m月d日 H:i') }}</td>
+        </tr></table>
     </div>
 
     <div class="page">

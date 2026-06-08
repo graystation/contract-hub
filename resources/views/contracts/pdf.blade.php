@@ -137,7 +137,7 @@
             white-space: pre-wrap;
         }
 
-        /* Footer */
+        /* Footer — repeated on every page via position:fixed */
         .footer {
             position: fixed;
             bottom: 10mm;
@@ -147,8 +147,13 @@
             padding-top: 4pt;
             font-size: 8pt;
             color: #aaa;
-            text-align: right;
         }
+        .footer table { width: 100%; border-collapse: collapse; }
+        .footer td { padding: 0; vertical-align: top; }
+        .footer .f-left  { text-align: left; }
+        .footer .f-right { text-align: right; }
+        /* counter(pages) is unreliable in dompdf; show only current page number */
+        .page-num:before { content: "- " counter(page) " -"; }
 
         .generated-at {
             font-size: 8pt;
@@ -159,8 +164,12 @@
     </style>
 </head>
 <body>
+
     <div class="footer">
-        {{ $contract->contract_number }} &nbsp;|&nbsp; {{ now()->format('Y年m月d日') }} 生成
+        <table><tr>
+            <td class="f-left"><span class="page-num"></span></td>
+            <td class="f-right">{{ $contract->contract_number }} &nbsp;|&nbsp; {{ now()->format('Y年m月d日') }} 生成</td>
+        </tr></table>
     </div>
 
     <div class="page">
