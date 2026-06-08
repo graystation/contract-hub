@@ -29,7 +29,6 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約種別</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締結日</th>
-                            <th class="px-6 py-3"></th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
@@ -62,21 +61,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                     {{ $contract->signed_at?->format('Y/m/d') ?? '—' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                    <a href="{{ route('contracts.edit', $contract) }}"
-                                       class="text-indigo-600 hover:text-indigo-900">編集</a>
-                                    <form method="POST" action="{{ route('contracts.destroy', $contract) }}"
-                                          class="inline"
-                                          onsubmit="return confirm('「{{ $contract->contract_number }}」を削除してよろしいですか？\nこの操作は取り消せません。')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">削除</button>
-                                    </form>
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-400">
+                                <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">
                                     契約が登録されていません。
                                 </td>
                             </tr>

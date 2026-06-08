@@ -65,6 +65,18 @@
                 </div>
             </div>
 
+            {{-- Contract body — the actual terms the signer is agreeing to --}}
+            @if ($contract->body)
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">契約書本文</h2>
+                </div>
+                <div class="px-6 py-5 prose prose-sm max-w-none">
+                    {!! $contract->body !!}
+                </div>
+            </div>
+            @endif
+
             {{-- Consent form --}}
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">

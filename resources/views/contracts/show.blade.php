@@ -55,6 +55,16 @@ $actionLabels = [
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
                 </a>
+                <form method="POST" action="{{ route('contracts.destroy', $contract) }}"
+                      class="ml-4 pl-4 border-l border-gray-300"
+                      onsubmit="return confirmContractDelete(event, '{{ $contract->contract_number }}')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                            class="px-4 py-2 bg-white border border-red-300 text-red-600 text-sm font-medium rounded-md hover:bg-red-50">
+                        削除
+                    </button>
+                </form>
             </div>
         </div>
     </x-slot>
@@ -522,4 +532,25 @@ $actionLabels = [
 
         </div>
     </div>
+
+    <script>
+        // Two-step confirmation for contract deletion: a yes/no dialog,
+        // then requiring the exact contract number to be typed before submitting.
+        function confirmContractDelete(event, contractNumber) {
+            if (!window.confirm('「' + contractNumber + '」を削除します。\nこの操作は取り消せません。本当によろしいですか？')) {
+                return false;
+            }
+
+            const input = window.prompt(
+                '削除を確定するには、契約番号を正確に入力してください。\n\n契約番号: ' + contractNumber
+            );
+
+            if (input !== contractNumber) {
+                window.alert('契約番号が一致しなかったため、削除を中止しました。');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </x-app-layout>
