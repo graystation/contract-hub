@@ -49,7 +49,7 @@ $actionLabels = [
                 </form>
                 <a href="{{ route('contracts.edit', $contract) }}"
                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
-                    編集
+                    契約書を編集
                 </a>
                 <a href="{{ route('contracts.index') }}"
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
@@ -128,11 +128,18 @@ $actionLabels = [
 
             {{-- Contract body --}}
             @if ($contract->body)
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">契約書本文</h3>
-                </div>
-                <div class="px-6 py-5 prose prose-sm max-w-none">
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden" x-data="{ open: false }">
+                <button type="button"
+                        @click="open = !open"
+                        class="w-full px-6 py-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">2. 契約書本文</h3>
+                    <svg :class="open ? 'rotate-180' : ''"
+                         class="w-4 h-4 text-gray-400 transition-transform"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+                <div x-show="open" x-cloak class="px-6 py-5 prose prose-sm max-w-none border-t border-gray-100">
                     {!! $contract->body !!}
                 </div>
             </div>
@@ -141,7 +148,7 @@ $actionLabels = [
             {{-- Section 2: Related project / customer --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">2. 関連案件・顧客情報</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 関連案件・顧客情報</h3>
                 </div>
                 <div class="p-6">
                     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
@@ -193,7 +200,7 @@ $actionLabels = [
             {{-- Section 3: Latest PDF --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 最新の契約PDF</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の契約PDF</h3>
                 </div>
 
                 @if ($latestPdf)
@@ -238,7 +245,7 @@ $actionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
                 {{ $contract->status === 'signed' ? 'border-green-500' : ($contract->sign_token ? 'border-violet-500' : 'border-gray-300') }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 電子同意</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">5. 電子同意</h3>
                 </div>
                 <div class="p-6">
 
@@ -361,7 +368,7 @@ $actionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        5. 契約ファイル一覧
+                        6. 契約ファイル一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contract->files->count() }} 件</span>
                     </h3>
                     <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
@@ -423,7 +430,7 @@ $actionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        6. 証跡エクスポート
+                        7. 証跡エクスポート
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $evidenceExports->count() }} 件</span>
                     </h3>
                     <form method="POST" action="{{ route('contracts.evidence-exports.store', $contract) }}">
@@ -486,7 +493,7 @@ $actionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        7. 監査ログ
+                        8. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>

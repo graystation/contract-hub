@@ -123,7 +123,6 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約種別</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締結日</th>
-                                <th class="px-6 py-3"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
@@ -143,10 +142,6 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                         {{ $contract->signed_at?->format('Y/m/d') ?? '—' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                        <a href="{{ route('contracts.edit', $contract) }}"
-                                           class="text-indigo-600 hover:text-indigo-900">編集</a>
                                     </td>
                                 </tr>
                             @endforeach

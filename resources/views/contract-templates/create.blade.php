@@ -35,7 +35,7 @@ $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサル�
 
                 {{-- Row 2: formatting toolbar --}}
                 <div class="max-w-4xl mx-auto px-6 py-2 border-t border-gray-100 flex flex-wrap items-center gap-1">
-                    @include('contract-templates._editor-toolbar')
+                    @include('components.tiptap-toolbar')
                 </div>
 
             </div>
