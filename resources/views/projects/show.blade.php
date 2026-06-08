@@ -22,6 +22,16 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
                 </a>
+                <form method="POST" action="{{ route('projects.destroy', $project) }}"
+                      class="ml-4 pl-4 border-l border-gray-300"
+                      onsubmit="return confirmProjectDelete(event, '{{ $project->title }}')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                            class="px-4 py-2 bg-white border border-red-300 text-red-600 text-sm font-medium rounded-md hover:bg-red-50">
+                        削除
+                    </button>
+                </form>
             </div>
         </div>
     </x-slot>
@@ -202,4 +212,25 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
 
         </div>
     </div>
+
+    <script>
+        // Two-step confirmation for project deletion: a yes/no dialog,
+        // then requiring the exact project title to be typed before submitting.
+        function confirmProjectDelete(event, projectTitle) {
+            if (!window.confirm('「' + projectTitle + '」を削除します。\nこの操作は取り消せません。本当によろしいですか？')) {
+                return false;
+            }
+
+            const input = window.prompt(
+                '削除を確定するには、案件名を正確に入力してください。\n\n案件名: ' + projectTitle
+            );
+
+            if (input !== projectTitle) {
+                window.alert('案件名が一致しなかったため、削除を中止しました。');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </x-app-layout>
