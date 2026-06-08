@@ -1,4 +1,4 @@
-@props(['name' => 'body', 'value' => ''])
+@props(['name' => 'body', 'value' => '', 'stickyTopClass' => 'top-0'])
 
 <div
     x-data="tiptapEditor({ content: {{ Js::from($value) }} })"
@@ -7,7 +7,7 @@
     class="border border-gray-300 rounded-md overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500"
 >
     {{-- Toolbar --}}
-    <div class="flex flex-wrap items-center gap-1 px-3 py-2 bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+    <div class="flex flex-wrap items-center gap-1 px-3 py-2 bg-gray-50 border-b border-gray-200 sticky {{ $stickyTopClass }} z-20">
 
         {{-- Headings --}}
         <button type="button" @click="toggleH2()"

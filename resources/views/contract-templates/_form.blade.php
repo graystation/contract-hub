@@ -44,7 +44,7 @@ $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサル�
             </div>
         </div>
 
-        <x-tiptap-editor name="body" :value="old('body', $template->body ?? '')" />
+        <x-tiptap-editor name="body" :value="old('body', $template->body ?? '')" stickyTopClass="top-[60px]" />
         @error('body') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
 </div>
