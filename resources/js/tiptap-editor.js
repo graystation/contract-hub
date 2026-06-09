@@ -78,7 +78,7 @@ window.contractForm = (config = {}) => ({
     projectId:      config.projectId      || '',
     contractNumber: config.contractNumber || '',
     contractType:   config.contractType   || '',
-    templateId:     '',
+    templateId:     config.templateId || '',
 
     applyTemplate() {
         if (!this.templateId) return;

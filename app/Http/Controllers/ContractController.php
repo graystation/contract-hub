@@ -44,7 +44,7 @@ class ContractController extends Controller
 
     public function show(Contract $contract)
     {
-        $contract->load('project.company', 'files');
+        $contract->load('project.company', 'files', 'template');
 
         $latestPdf            = $this->fileService->getLatestPdf($contract);
         $auditLogs            = $this->fileService->getRelatedAuditLogs($contract);

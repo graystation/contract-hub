@@ -54,7 +54,7 @@
             font-weight: bold;
             color: #1a1a2e;
             letter-spacing: 6pt;
-            margin-bottom: 4pt;
+            margin-bottom: 10pt;
         }
 
         .doc-number {
@@ -77,6 +77,7 @@
             border-left: 4pt solid #1a1a2e;
             margin-bottom: 4mm;
             letter-spacing: 1pt;
+            page-break-after: avoid;
         }
 
         /* Definition list table */
@@ -119,8 +120,8 @@
 
         /* Contract body (rich text from Tiptap) */
         .contract-body { font-size: 10pt; line-height: 1.8; }
-        .contract-body h2 { font-size: 12pt; font-weight: bold; margin: 10pt 0 4pt; border-bottom: 0.5pt solid #ccc; padding-bottom: 2pt; }
-        .contract-body h3 { font-size: 10.5pt; font-weight: bold; margin: 8pt 0 3pt; }
+        .contract-body h2 { font-size: 12pt; font-weight: bold; margin: 10pt 0 4pt; border-bottom: 0.5pt solid #ccc; padding-bottom: 2pt; page-break-after: avoid; }
+        .contract-body h3 { font-size: 10.5pt; font-weight: bold; margin: 8pt 0 3pt; page-break-after: avoid; }
         .contract-body p  { margin: 0 0 6pt; }
         .contract-body ul, .contract-body ol { margin: 4pt 0 6pt 16pt; }
         .contract-body li { margin-bottom: 2pt; }
@@ -262,7 +263,7 @@
         {{-- Contract body --}}
         @if ($contract->body)
         <div class="section">
-            <div class="section-title">契約内容</div>
+            <div class="section-title">契約書本文</div>
             <div class="contract-body">{!! $contract->body !!}</div>
         </div>
         @endif

@@ -122,6 +122,16 @@ $actionLabels = [
                                 <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ $contract->notes }}</dd>
                             </div>
                         @endif
+                        @if ($contract->template)
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">使用テンプレート</dt>
+                                <dd class="mt-1 flex items-center gap-3">
+                                    <span class="text-sm text-gray-900">{{ $contract->template->title }}</span>
+                                    <a href="{{ route('contract-templates.edit', $contract->template) }}"
+                                       class="text-xs text-indigo-600 hover:text-indigo-800">テンプレートを編集 →</a>
+                                </dd>
+                            </div>
+                        @endif
                     </dl>
                 </div>
             </div>

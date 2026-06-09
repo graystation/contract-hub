@@ -174,6 +174,7 @@ window.__contractProjects__  = @json($projectMap);
                     </button>
                     <a href="{{ route('contract-templates.index') }}" target="_blank"
                        class="text-xs text-gray-400 hover:text-indigo-600">テンプレート管理</a>
+                    <input type="hidden" name="template_id" :value="templateId || ''">
                 </div>
                 @else
                 <div class="col-span-2 pt-2">

@@ -13,6 +13,7 @@ class Contract extends Model
 
     protected $fillable = [
         'project_id',
+        'template_id',
         'contract_number',
         'contract_type',
         'signed_at',
@@ -37,6 +38,11 @@ class Contract extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(ContractTemplate::class);
     }
 
     public function files(): HasMany

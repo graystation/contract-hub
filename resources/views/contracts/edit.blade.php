@@ -83,7 +83,8 @@ window.__contractProjects__  = @json($projectMap);
             <div x-data="contractForm({
                     projectId:      {{ Js::from($currentProjectId) }},
                     contractNumber: {{ Js::from($currentContractNumber) }},
-                    contractType:   {{ Js::from($currentContractType) }}
+                    contractType:   {{ Js::from($currentContractType) }},
+                    templateId:     {{ Js::from(old('template_id', $contract->template_id ?? '')) }}
                  })"
                  class="grid grid-cols-2 gap-x-8 gap-y-5">
 
@@ -175,6 +176,7 @@ window.__contractProjects__  = @json($projectMap);
                     </button>
                     <a href="{{ route('contract-templates.index') }}" target="_blank"
                        class="text-xs text-gray-400 hover:text-indigo-600">テンプレート管理</a>
+                    <input type="hidden" name="template_id" :value="templateId || ''">
                 </div>
                 @endif
 

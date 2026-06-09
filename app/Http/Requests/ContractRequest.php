@@ -19,6 +19,7 @@ class ContractRequest extends FormRequest
 
         return [
             'project_id'      => ['required', 'exists:projects,id'],
+            'template_id'     => ['nullable', 'exists:contract_templates,id'],
             'contract_number' => ['required', 'string', 'max:50', Rule::unique('contracts', 'contract_number')->ignore($contractId)],
             'contract_type'   => ['required', 'string', 'max:255'],
             'signed_at'       => ['nullable', 'date'],
