@@ -35,10 +35,11 @@
             line-height: 1.7;
             word-break: break-all;
             overflow-wrap: break-word;
+            padding: 30mm 20mm 25mm 25mm;
         }
 
-        .page {
-            padding: 30mm 20mm 25mm 25mm;
+        @page {
+            margin: 0;
         }
 
         /* Header */
@@ -173,7 +174,7 @@
         </tr></table>
     </div>
 
-    <div class="page">
+    <div>
 
         {{-- Document Header --}}
         <div class="doc-header">
