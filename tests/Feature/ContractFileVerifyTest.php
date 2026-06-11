@@ -143,4 +143,61 @@ class ContractFileVerifyTest extends TestCase
 
         $this->assertNull($service->getLatestPdf($contract));
     }
+
+    /** PDF preview returns inline PDF content without persisting a file. */
+    public function test_pdf_preview_returns_pdf_without_persisting(): void
+    {
+        Storage::fake('contracts');
+
+        $contract = Contract::factory()->create();
+        $contract->load('project.company');
+
+        $response = $this->actingAs($this->user)
+            ->get(route('contracts.pdf.preview', $contract));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+
+        $this->assertDatabaseMissing('contract_files', ['contract_id' => $contract->id]);
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'contract_pdf_generated']);
+    }
+
+    /** A draft contract's PDF file can be deleted, removing the file and recording an audit log. */
+    public function test_draft_contract_pdf_can_be_deleted(): void
+    {
+        Storage::fake('contracts');
+
+        $contract = Contract::factory()->create(['status' => 'draft']);
+        $file     = $this->makeFileWithContent($contract, '%PDF-test-content');
+
+        $this->actingAs($this->user)
+            ->delete(route('contracts.files.destroy', [$contract, $file]))
+            ->assertRedirect(route('contracts.show', $contract))
+            ->assertSessionHas('success', 'PDFファイルを削除しました。');
+
+        $this->assertDatabaseMissing('contract_files', ['id' => $file->id]);
+        Storage::disk('contracts')->assertMissing($file->file_path);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action'      => 'contract_file_deleted',
+            'target_type' => 'contract',
+            'target_id'   => $contract->id,
+        ]);
+    }
+
+    /** A signed contract's PDF file cannot be deleted. */
+    public function test_signed_contract_pdf_cannot_be_deleted(): void
+    {
+        Storage::fake('contracts');
+
+        $contract = Contract::factory()->create(['status' => 'signed']);
+        $file     = $this->makeFileWithContent($contract, '%PDF-test-content');
+
+        $this->actingAs($this->user)
+            ->delete(route('contracts.files.destroy', [$contract, $file]))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('contract_files', ['id' => $file->id]);
+        Storage::disk('contracts')->assertExists($file->file_path);
+    }
 }

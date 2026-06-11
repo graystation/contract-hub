@@ -21,7 +21,40 @@ class ContractFileController extends Controller
 
         return redirect()
             ->route('contracts.show', $contract)
-            ->with('success', 'PDFを生成しました。');
+            ->with('success', 'PDFを生成して保存しました。');
+    }
+
+    /**
+     * Generate a PDF for preview without persisting it.
+     */
+    public function preview(Contract $contract)
+    {
+        $pdfContent = $this->service->preview($contract);
+
+        return response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="preview.pdf"',
+        ]);
+    }
+
+    /**
+     * Delete a stored PDF file and its record.
+     */
+    public function destroy(Contract $contract, ContractFile $contractFile, Request $request)
+    {
+        abort_unless($contractFile->contract_id === $contract->id, 404);
+
+        abort_if(
+            in_array($contract->status, ['signed', 'cancelled'], true),
+            403,
+            '締結済み・キャンセル済みの契約のPDFは削除できません。',
+        );
+
+        $this->service->deleteFile($contractFile, $request);
+
+        return redirect()
+            ->route('contracts.show', $contract)
+            ->with('success', 'PDFファイルを削除しました。');
     }
 
     /**

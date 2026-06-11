@@ -64,13 +64,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('contracts/{contract}/evidence-exports/{export}/download', [ContractEvidenceExportController::class, 'download'])
         ->name('contracts.evidence-exports.download');
 
-    // Contract file: PDF generation, download, and hash verification
+    // Contract file: PDF generation, preview, download, hash verification, and deletion
     Route::post('contracts/{contract}/pdf', [ContractFileController::class, 'store'])
         ->name('contracts.pdf.store');
+    Route::get('contracts/{contract}/pdf/preview', [ContractFileController::class, 'preview'])
+        ->name('contracts.pdf.preview');
     Route::get('contracts/{contract}/files/{contractFile}/download', [ContractFileController::class, 'download'])
         ->name('contracts.files.download');
     Route::post('contracts/{contract}/files/{contractFile}/verify-hash', [ContractFileController::class, 'verifyHash'])
         ->name('contracts.files.verify-hash');
+    Route::delete('contracts/{contract}/files/{contractFile}', [ContractFileController::class, 'destroy'])
+        ->name('contracts.files.destroy');
 
     // Contract signing: generate sign URL (admin only)
     Route::post('contracts/{contract}/generate-sign-url', [ContractSigningController::class, 'generate'])

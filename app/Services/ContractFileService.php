@@ -53,6 +53,33 @@ class ContractFileService
     }
 
     /**
+     * Generate a PDF for preview without persisting it to storage.
+     */
+    public function preview(Contract $contract): string
+    {
+        return $this->pdfService->generateContractPdf($contract);
+    }
+
+    /**
+     * Delete a stored PDF file and its record.
+     */
+    public function deleteFile(ContractFile $contractFile, Request $request): void
+    {
+        Storage::disk('contracts')->delete($contractFile->file_path);
+
+        $contractId = $contractFile->contract_id;
+
+        $contractFile->delete();
+
+        $this->auditLogService->log(
+            action: 'contract_file_deleted',
+            targetType: 'contract',
+            targetId: $contractId,
+            request: $request,
+        );
+    }
+
+    /**
      * Return the most recently created PDF for the contract, or null if none.
      */
     public function getLatestPdf(Contract $contract): ?ContractFile

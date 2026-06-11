@@ -381,13 +381,19 @@ $actionLabels = [
                         6. 契約ファイル一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contract->files->count() }} 件</span>
                     </h3>
-                    <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
-                        @csrf
-                        <button type="submit"
-                                class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
-                            + PDFを生成
-                        </button>
-                    </form>
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('contracts.pdf.preview', $contract) }}" target="_blank"
+                           class="text-sm text-gray-500 hover:text-gray-800 font-medium">
+                            プレビュー
+                        </a>
+                        <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
+                                + PDFとして保存
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 @if ($contract->files->isEmpty())
@@ -427,6 +433,16 @@ $actionLabels = [
                                             @csrf
                                             <button type="submit" class="text-gray-500 hover:text-gray-800">検証</button>
                                         </form>
+                                        @unless (in_array($contract->status, ['signed', 'cancelled'], true))
+                                            <form method="POST"
+                                                  action="{{ route('contracts.files.destroy', [$contract, $file]) }}"
+                                                  class="inline"
+                                                  onsubmit="return confirm('このPDFファイルを削除します。よろしいですか？');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-500 hover:text-red-700">削除</button>
+                                            </form>
+                                        @endunless
                                     </td>
                                 </tr>
                             @endforeach
