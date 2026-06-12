@@ -40,13 +40,10 @@ $actionLabels = [
                         </button>
                     </form>
                 @endif
-                <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
-                    @csrf
-                    <button type="submit"
-                            class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
-                        PDF生成
-                    </button>
-                </form>
+                <a href="{{ route('contracts.pdf.preview', $contract) }}" target="_blank"
+                   class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                    PDFプレビュー
+                </a>
                 <a href="{{ route('contracts.edit', $contract) }}"
                    class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
                     契約書を編集
