@@ -17,6 +17,12 @@ class InvoiceFileController extends Controller
      */
     public function store(Invoice $invoice, Request $request)
     {
+        abort_if(
+            in_array($invoice->status, ['paid', 'cancelled'], true),
+            403,
+            '入金済み・キャンセル済みの請求書のPDFは再生成できません。',
+        );
+
         $this->service->generateAndStore($invoice, $request);
 
         return redirect()

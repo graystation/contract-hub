@@ -113,7 +113,7 @@ class ContractFileVerifyTest extends TestCase
     {
         Storage::fake('contracts');
 
-        $contract = Contract::factory()->create();
+        $contract = Contract::factory()->create(['status' => 'draft']);
         $contract->load('project.company');
 
         $this->actingAs($this->user)

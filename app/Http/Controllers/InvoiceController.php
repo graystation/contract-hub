@@ -61,6 +61,12 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        abort_if(
+            in_array($invoice->status, ['paid', 'cancelled'], true),
+            403,
+            '入金済み・キャンセル済みの請求書は編集できません。',
+        );
+
         return view('invoices.edit', [
             'invoice'  => $invoice,
             'projects' => Project::with('company')->orderByDesc('created_at')->get(),
@@ -70,6 +76,12 @@ class InvoiceController extends Controller
 
     public function update(InvoiceRequest $request, Invoice $invoice)
     {
+        abort_if(
+            in_array($invoice->status, ['paid', 'cancelled'], true),
+            403,
+            '入金済み・キャンセル済みの請求書は編集できません。',
+        );
+
         $this->service->update($invoice, $request->validated(), $request);
 
         return redirect()->route('invoices.show', $invoice)->with('success', '請求書を更新しました。');
@@ -77,6 +89,12 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice, Request $request)
     {
+        abort_if(
+            in_array($invoice->status, ['paid', 'cancelled'], true) || $invoice->payments()->exists(),
+            403,
+            '入金記録のある、または入金済み・キャンセル済みの請求書は削除できません。',
+        );
+
         $this->service->delete($invoice, $request);
 
         return redirect()->route('invoices.index')->with('success', '請求書を削除しました。');

@@ -40,17 +40,19 @@ $auditActionLabels = [
                         </button>
                     </form>
                 @endif
-                <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
-                    @csrf
-                    <button type="submit"
-                            class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
-                        PDF生成
-                    </button>
-                </form>
-                <a href="{{ route('invoices.edit', $invoice) }}"
-                   class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
-                    編集
-                </a>
+                @unless (in_array($invoice->status, ['paid', 'cancelled'], true))
+                    <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
+                        @csrf
+                        <button type="submit"
+                                class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                            PDF生成
+                        </button>
+                    </form>
+                    <a href="{{ route('invoices.edit', $invoice) }}"
+                       class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                        編集
+                    </a>
+                @endunless
                 <a href="{{ route('invoices.index') }}"
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
@@ -225,13 +227,15 @@ $auditActionLabels = [
                         5. 請求書ファイル一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoice->files->count() }} 件</span>
                     </h3>
-                    <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
-                        @csrf
-                        <button type="submit"
-                                class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
-                            + PDFを生成
-                        </button>
-                    </form>
+                    @unless (in_array($invoice->status, ['paid', 'cancelled'], true))
+                        <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
+                                + PDFを生成
+                            </button>
+                        </form>
+                    @endunless
                 </div>
 
                 @if ($invoice->files->isEmpty())
