@@ -17,6 +17,12 @@ class ContractFileController extends Controller
      */
     public function store(Contract $contract, Request $request)
     {
+        abort_if(
+            in_array($contract->status, ['signed', 'cancelled'], true),
+            403,
+            '締結済み・キャンセル済みの契約のPDFは再生成できません。',
+        );
+
         $this->service->generateAndStore($contract, $request);
 
         return redirect()

@@ -62,6 +62,12 @@ class ContractController extends Controller
 
     public function edit(Contract $contract)
     {
+        abort_if(
+            in_array($contract->status, ['signed', 'cancelled'], true),
+            403,
+            '締結済み・キャンセル済みの契約は編集できません。',
+        );
+
         return view('contracts.edit', [
             'contract'  => $contract,
             'projects'  => Project::with('company')->orderByDesc('created_at')->get(),
@@ -72,6 +78,12 @@ class ContractController extends Controller
 
     public function update(ContractRequest $request, Contract $contract)
     {
+        abort_if(
+            in_array($contract->status, ['signed', 'cancelled'], true),
+            403,
+            '締結済み・キャンセル済みの契約は編集できません。',
+        );
+
         $this->service->update($contract, $request->validated());
 
         return redirect()->route('contracts.show', $contract)->with('success', '契約を更新しました。');

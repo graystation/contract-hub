@@ -44,10 +44,12 @@ $actionLabels = [
                    class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
                     PDFプレビュー
                 </a>
-                <a href="{{ route('contracts.edit', $contract) }}"
-                   class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
-                    契約書を編集
-                </a>
+                @unless (in_array($contract->status, ['signed', 'cancelled'], true))
+                    <a href="{{ route('contracts.edit', $contract) }}"
+                       class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                        契約書を編集
+                    </a>
+                @endunless
                 <a href="{{ route('contracts.index') }}"
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
@@ -383,13 +385,15 @@ $actionLabels = [
                            class="text-sm text-gray-500 hover:text-gray-800 font-medium">
                             プレビュー
                         </a>
-                        <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
-                            @csrf
-                            <button type="submit"
-                                    class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
-                                + PDFとして保存
-                            </button>
-                        </form>
+                        @unless (in_array($contract->status, ['signed', 'cancelled'], true))
+                            <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="text-sm text-emerald-600 hover:text-emerald-800 font-medium">
+                                    + PDFとして保存
+                                </button>
+                            </form>
+                        @endunless
                     </div>
                 </div>
 
