@@ -31,15 +31,6 @@ $actionLabels = [
                 </h2>
             </div>
             <div class="flex items-center space-x-2">
-                @if ($contract->status !== 'signed' && $contract->status !== 'cancelled')
-                    <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
-                        @csrf
-                        <button type="submit"
-                                class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
-                            同意URLを発行
-                        </button>
-                    </form>
-                @endif
                 <a href="{{ route('contracts.pdf.preview', $contract) }}" target="_blank"
                    class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
                     PDFプレビュー
@@ -460,13 +451,15 @@ $actionLabels = [
                         7. 証跡エクスポート
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $evidenceExports->count() }} 件</span>
                     </h3>
-                    <form method="POST" action="{{ route('contracts.evidence-exports.store', $contract) }}">
-                        @csrf
-                        <button type="submit"
-                                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                            + 証跡ZIPを生成
-                        </button>
-                    </form>
+                    @if ($contract->status === 'signed')
+                        <form method="POST" action="{{ route('contracts.evidence-exports.store', $contract) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                                + 証跡ZIPを生成
+                            </button>
+                        </form>
+                    @endif
                 </div>
 
                 <div class="px-6 py-4 bg-blue-50 border-b border-blue-100 text-xs text-blue-700">
@@ -476,7 +469,11 @@ $actionLabels = [
 
                 @if ($evidenceExports->isEmpty())
                     <div class="px-6 py-6 text-center text-sm text-gray-400">
-                        証跡ZIPが生成されていません。「証跡ZIPを生成」から作成してください。
+                        @if ($contract->status === 'signed')
+                            証跡ZIPが生成されていません。「証跡ZIPを生成」から作成してください。
+                        @else
+                            証跡ZIPは締結済みの契約のみ生成できます。
+                        @endif
                     </div>
                 @else
                     <div class="overflow-x-auto">

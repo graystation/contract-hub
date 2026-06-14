@@ -25,7 +25,7 @@ class ContractEvidenceExportControllerTest extends TestCase
     /** The contract show page renders the evidence ZIP generate button. */
     public function test_show_page_has_evidence_export_button(): void
     {
-        $contract = Contract::factory()->create();
+        $contract = Contract::factory()->create(['status' => 'signed']);
         $contract->load('project.company');
 
         $this->actingAs($this->user)

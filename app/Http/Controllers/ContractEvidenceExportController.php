@@ -18,6 +18,12 @@ class ContractEvidenceExportController extends Controller
      */
     public function store(Contract $contract, Request $request)
     {
+        abort_unless(
+            $contract->status === 'signed',
+            403,
+            '締結済みの契約のみ証跡ZIPを生成できます。',
+        );
+
         try {
             $this->service->generateEvidenceZip($contract, $request);
         } catch (\Throwable $e) {
