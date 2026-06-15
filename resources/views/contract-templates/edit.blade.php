@@ -65,9 +65,9 @@
                 </div>
 
                 {{-- 変数チートシート --}}
-                <div class="p-3 bg-blue-50 border border-blue-200 rounded-md text-xs text-blue-800">
-                    <p class="font-medium mb-2">使用できる変数（クリックで挿入）</p>
-                    <div class="flex flex-wrap gap-2">
+                <div class="sticky top-[88px] z-30 -mx-6 px-6 py-3 bg-blue-50 border-b border-blue-200 text-xs text-blue-800 shadow-sm">
+                    <p class="font-medium mb-2 max-w-4xl mx-auto">使用できる変数（クリックで挿入）</p>
+                    <div class="flex flex-wrap gap-2 max-w-4xl mx-auto">
                         @foreach ($variables as $var => $desc)
                             <button type="button"
                                     onclick="window._tiptapEditor?.insertText('{{ $var }}'); this.classList.add('ring-1','ring-blue-400'); setTimeout(() => this.classList.remove('ring-1','ring-blue-400'), 500)"
