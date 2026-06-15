@@ -25,6 +25,7 @@ Route::get('/', function () {
 Route::prefix('sign/contracts')->name('sign.contracts.')->group(function () {
     Route::get('{token}', [ConsentController::class, 'show'])->name('show');
     Route::post('{token}', [ConsentController::class, 'store'])->name('store');
+    Route::get('{token}/pdf', [ConsentController::class, 'downloadPdf'])->name('pdf');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

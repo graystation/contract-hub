@@ -290,9 +290,10 @@ class ContractMailTest extends TestCase
     private function consentPayload(array $overrides = []): array
     {
         return array_merge([
-            'signer_name'  => 'Test Signer',
-            'signer_email' => 'signer@example.com',
-            'agreed'       => '1',
+            'signer_name'    => 'Test Signer',
+            'signer_email'   => 'signer@example.com',
+            'signer_address' => '東京都千代田区〇〇1-2-3',
+            'agreed'         => '1',
         ], $overrides);
     }
 }

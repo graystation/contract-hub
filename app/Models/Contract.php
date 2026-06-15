@@ -24,6 +24,7 @@ class Contract extends Model
         'sign_token_expires_at',
         'signer_name',
         'signer_email',
+        'signer_address',
         'signer_ip_address',
         'signer_user_agent',
     ];

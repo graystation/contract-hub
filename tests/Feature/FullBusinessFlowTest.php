@@ -124,9 +124,10 @@ class FullBusinessFlowTest extends TestCase
         // Step 6: 外部同意（ログイン不要）
         // ===========================================================
         $this->post(route('sign.contracts.store', $contract->sign_token), [
-            'signer_name'  => '外部 同意者',
-            'signer_email' => 'signer@e2e-test.com',
-            'agreed'       => '1',
+            'signer_name'    => '外部 同意者',
+            'signer_email'   => 'signer@e2e-test.com',
+            'signer_address' => '東京都千代田区〇〇1-2-3',
+            'agreed'         => '1',
         ])->assertOk(); // shows sign.complete view
 
         Mail::assertSent(ContractSignedNotificationMail::class);

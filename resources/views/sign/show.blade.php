@@ -121,6 +121,18 @@
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_email') border-red-500 @enderror">
                             </div>
 
+                            <div>
+                                <label for="signer_address" class="block text-sm font-medium text-gray-700">
+                                    住所 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       id="signer_address"
+                                       name="signer_address"
+                                       value="{{ old('signer_address') }}"
+                                       placeholder="東京都千代田区〇〇1-2-3"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_address') border-red-500 @enderror">
+                            </div>
+
                             <div class="pt-2 border-t border-gray-100">
                                 <label class="flex items-start gap-3 cursor-pointer">
                                     <input type="checkbox"

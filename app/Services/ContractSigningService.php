@@ -77,6 +77,7 @@ class ContractSigningService
         $contract->update([
             'signer_name'       => $validated['signer_name'],
             'signer_email'      => $validated['signer_email'],
+            'signer_address'    => $validated['signer_address'],
             'signer_ip_address' => $request->ip(),
             'signer_user_agent' => $request->userAgent(),
             'signed_at'         => now(),

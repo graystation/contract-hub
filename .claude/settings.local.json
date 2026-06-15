@@ -61,7 +61,12 @@
       "Read(//Users/kei/clinic-tech-lab/resources/js/**)",
       "Read(//Users/kei/clinic-tech-lab/resources/**)",
       "Bash(grep -o \"insertContent\\(.\\\\{1,30\\\\}\\)\" /Users/kei/contract-hub/public/build/assets/app-BOM3Apen.js)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(unzip -o \"/Users/kei/contract-hub/storage/app/contract-evidence/CTR-2026-0001_evidence_20260615161612.zip\")",
+      "Bash(shasum -a 256 contract.pdf audit-log.csv metadata.json)",
+      "Bash(shasum -a 256 \"/Users/kei/contract-hub/storage/app/contract-evidence/CTR-2026-0001_evidence_20260615161612.zip\")",
+      "Bash(shasum -a 256 /tmp/test_signed.pdf)",
+      "Bash(grep *)"
     ]
   }
 }

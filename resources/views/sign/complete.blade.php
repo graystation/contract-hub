@@ -46,6 +46,11 @@
                         </div>
                     </dl>
 
+                    <a href="{{ route('sign.contracts.pdf', $contract->sign_token) }}"
+                       class="block w-full px-4 py-2 mb-4 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                        契約書PDFをダウンロード
+                    </a>
+
                     <p class="text-xs text-gray-400">
                         このページを閉じても問題ありません。<br>
                         同意内容はシステムに記録されています。

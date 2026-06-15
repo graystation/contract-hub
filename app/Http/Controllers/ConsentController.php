@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ConsentRequest;
+use App\Services\ContractFileService;
 use App\Services\ContractMailService;
 use App\Services\ContractSigningService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ConsentController extends Controller
 {
     public function __construct(
         private ContractSigningService $signingService,
         private ContractMailService $mailService,
+        private ContractFileService $fileService,
     ) {}
 
     /**
@@ -67,5 +70,29 @@ class ConsentController extends Controller
             'contract' => $contract->fresh(),
             'signedAt' => now(),
         ]);
+    }
+
+    /**
+     * Download the signed contract PDF using the sign token.
+     * Only available once the contract has been signed.
+     */
+    public function downloadPdf(string $token)
+    {
+        $contract = $this->signingService->findByToken($token);
+
+        abort_if(! $contract || $contract->status !== 'signed', 404);
+
+        $contractFile = $this->fileService->getLatestPdf($contract);
+
+        abort_unless(
+            $contractFile && Storage::disk('contracts')->exists($contractFile->file_path),
+            404,
+            'ファイルが見つかりません。',
+        );
+
+        return Storage::disk('contracts')->download(
+            $contractFile->file_path,
+            $contractFile->file_name,
+        );
     }
 }
