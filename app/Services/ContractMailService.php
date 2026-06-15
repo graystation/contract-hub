@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Mail\ContractSignedCustomerMail;
 use App\Mail\ContractSignedNotificationMail;
 use App\Mail\ContractSignRequestMail;
 use App\Models\Contract;
+use App\Models\ContractFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -107,6 +109,46 @@ class ContractMailService
                 );
             } catch (\Throwable $auditE) {
                 Log::error('Failed to create failure audit log for notification mail', [
+                    'contract_id' => $contract->id,
+                    'error'       => $auditE->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Send the signed contract PDF to the external signer.
+     * All errors are caught internally — mail failure must not interrupt signing.
+     */
+    public function sendSignedCustomerMail(Contract $contract, ContractFile $contractFile, Request $request): void
+    {
+        try {
+            Mail::to($contract->signer_email)
+                ->send(new ContractSignedCustomerMail($contract, $contractFile));
+
+            $this->auditLogService->log(
+                action: 'contract_signed_customer_mail_sent',
+                targetType: 'contract',
+                targetId: $contract->id,
+                request: $request,
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send contract signed customer mail', [
+                'contract_id'     => $contract->id,
+                'contract_number' => $contract->contract_number,
+                'mail_type'       => ContractSignedCustomerMail::class,
+                'error'           => $e->getMessage(),
+            ]);
+
+            try {
+                $this->auditLogService->log(
+                    action: 'contract_signed_customer_mail_failed',
+                    targetType: 'contract',
+                    targetId: $contract->id,
+                    request: $request,
+                );
+            } catch (\Throwable $auditE) {
+                Log::error('Failed to create failure audit log for customer mail', [
                     'contract_id' => $contract->id,
                     'error'       => $auditE->getMessage(),
                 ]);

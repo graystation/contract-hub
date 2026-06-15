@@ -119,6 +119,21 @@
                                        value="{{ old('signer_email') }}"
                                        placeholder="example@example.com"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_email') border-red-500 @enderror">
+                                <p class="mt-1 text-xs text-gray-400">
+                                    契約締結完了後、このアドレスに契約書PDFをお送りします。
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="signer_email_confirmation" class="block text-sm font-medium text-gray-700">
+                                    メールアドレス（確認用） <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email"
+                                       id="signer_email_confirmation"
+                                       name="signer_email_confirmation"
+                                       value="{{ old('signer_email_confirmation') }}"
+                                       placeholder="example@example.com"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_email_confirmation') border-red-500 @enderror">
                             </div>
 
                             <div>

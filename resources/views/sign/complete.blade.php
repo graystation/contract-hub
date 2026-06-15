@@ -33,8 +33,12 @@
                             <dd class="text-xs text-gray-900 font-medium">{{ $contract->contract_number }}</dd>
                         </div>
                         <div class="px-4 py-3 grid grid-cols-2 gap-2">
+                            <dt class="text-xs font-medium text-gray-500">会社名</dt>
+                            <dd class="text-xs text-gray-900">{{ $contract->project->company->company_name }} 様</dd>
+                        </div>
+                        <div class="px-4 py-3 grid grid-cols-2 gap-2">
                             <dt class="text-xs font-medium text-gray-500">同意者氏名</dt>
-                            <dd class="text-xs text-gray-900">{{ $contract->signer_name }}</dd>
+                            <dd class="text-xs text-gray-900">{{ $contract->signer_name }} 様</dd>
                         </div>
                         <div class="px-4 py-3 grid grid-cols-2 gap-2">
                             <dt class="text-xs font-medium text-gray-500">同意者メール</dt>

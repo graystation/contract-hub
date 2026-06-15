@@ -50,11 +50,15 @@ class ContractSigningService
 
     /**
      * Return the validity state of a contract's token.
-     * Possible values: 'valid' | 'expired' | 'signed' | 'cancelled'
+     * Possible values: 'valid' | 'expired' | 'signed' | 'signed_expired' | 'cancelled'
      */
     public function getTokenStatus(Contract $contract): string
     {
         if ($contract->status === 'signed') {
+            if ($this->isDownloadExpired($contract)) {
+                return 'signed_expired';
+            }
+
             return 'signed';
         }
 
@@ -67,6 +71,16 @@ class ContractSigningService
         }
 
         return 'valid';
+    }
+
+    /**
+     * Whether a signed contract's PDF download link has passed its expiry
+     * (TOKEN_EXPIRY_DAYS days after signed_at).
+     */
+    public function isDownloadExpired(Contract $contract): bool
+    {
+        return $contract->signed_at !== null
+            && $contract->signed_at->addDays(self::TOKEN_EXPIRY_DAYS)->isPast();
     }
 
     /**

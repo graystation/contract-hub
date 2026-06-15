@@ -3,6 +3,8 @@
     <div
         x-data="tiptapEditor({ content: {{ Js::from(old('body', '')) }} })"
         x-init="setup()"
+        @keydown.window.cmd.s.prevent="$el.querySelector('form').requestSubmit()"
+        @keydown.window.ctrl.s.prevent="$el.querySelector('form').requestSubmit()"
         class="min-h-screen flex flex-col"
     >
         <form method="POST" action="{{ route('contract-templates.store') }}" class="flex flex-col flex-1">

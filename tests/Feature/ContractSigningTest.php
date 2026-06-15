@@ -298,11 +298,15 @@ class ContractSigningTest extends TestCase
 
     private function consentPayload(array $overrides = []): array
     {
-        return array_merge([
+        $payload = array_merge([
             'signer_name'    => 'Test Signer',
             'signer_email'   => 'signer@example.com',
             'signer_address' => '東京都千代田区〇〇1-2-3',
             'agreed'         => '1',
         ], $overrides);
+
+        $payload['signer_email_confirmation'] = $payload['signer_email'];
+
+        return $payload;
     }
 }

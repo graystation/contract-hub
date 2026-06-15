@@ -56,9 +56,11 @@ class ConsentController extends Controller
 
         $this->signingService->sign($contract, $request->validated(), $request);
 
+        $contract = $contract->fresh()->load('project.company');
+
         // Non-blocking: errors must not prevent the user from seeing the completion page
         try {
-            $this->mailService->sendSignedNotification($contract->fresh()->load('project.company'), $request);
+            $this->mailService->sendSignedNotification($contract, $request);
         } catch (\Throwable $e) {
             Log::error('Notification mail failed after signing', [
                 'contract_id' => $contract->id,
@@ -66,8 +68,14 @@ class ConsentController extends Controller
             ]);
         }
 
+        $contractFile = $this->fileService->getLatestPdf($contract);
+
+        if ($contractFile) {
+            $this->mailService->sendSignedCustomerMail($contract, $contractFile, $request);
+        }
+
         return view('sign.complete', [
-            'contract' => $contract->fresh(),
+            'contract' => $contract,
             'signedAt' => now(),
         ]);
     }
@@ -81,6 +89,8 @@ class ConsentController extends Controller
         $contract = $this->signingService->findByToken($token);
 
         abort_if(! $contract || $contract->status !== 'signed', 404);
+
+        abort_if($this->signingService->isDownloadExpired($contract), 404);
 
         $contractFile = $this->fileService->getLatestPdf($contract);
 

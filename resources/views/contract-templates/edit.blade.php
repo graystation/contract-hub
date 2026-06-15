@@ -5,6 +5,8 @@
         x-data="tiptapEditor({ content: {{ Js::from(old('body', $template->body ?? '')) }} })"
         x-init="setup()"
         @load-html.window="if ($event.detail.target === 'body') loadHtml($event.detail.html)"
+        @keydown.window.cmd.s.prevent="$el.querySelector('form').requestSubmit()"
+        @keydown.window.ctrl.s.prevent="$el.querySelector('form').requestSubmit()"
         class="min-h-screen flex flex-col"
     >
         <form method="POST" action="{{ route('contract-templates.update', $template) }}" class="flex flex-col flex-1">

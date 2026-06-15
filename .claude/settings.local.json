@@ -66,7 +66,8 @@
       "Bash(shasum -a 256 contract.pdf audit-log.csv metadata.json)",
       "Bash(shasum -a 256 \"/Users/kei/contract-hub/storage/app/contract-evidence/CTR-2026-0001_evidence_20260615161612.zip\")",
       "Bash(shasum -a 256 /tmp/test_signed.pdf)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(pdftotext storage/app/contracts/CTR-2026-0002_20260616062913.pdf -)"
     ]
   }
 }

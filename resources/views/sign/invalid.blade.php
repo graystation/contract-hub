@@ -19,6 +19,7 @@
                             'not_found'  => ['icon' => '🔍', 'title' => 'URLが見つかりません', 'body' => '指定された同意URLは存在しません。URLをご確認ください。'],
                             'expired'    => ['icon' => '⏰', 'title' => '同意URLの有効期限が切れています', 'body' => 'この同意URLの有効期限が切れています。担当者にご連絡のうえ、URLを再発行していただいてください。'],
                             'signed'     => ['icon' => '✅', 'title' => 'この契約はすでに締結済みです', 'body' => 'この契約への同意はすでに完了しています。'],
+                            'signed_expired' => ['icon' => '✅', 'title' => 'この契約はすでに締結済みです', 'body' => 'この契約への同意は完了していますが、PDFのダウンロード期限（締結から14日間）を過ぎたため、このURLからのダウンロードはできません。PDFが必要な場合は担当者にお問い合わせください。'],
                             'cancelled'  => ['icon' => '❌', 'title' => 'この契約はキャンセルされています', 'body' => 'この契約はキャンセルされています。詳細は担当者にお問い合わせください。'],
                         ];
                         $msg = $messages[$reason] ?? $messages['not_found'];
@@ -33,6 +34,11 @@
                             <div>契約番号：{{ $contract->contract_number }}</div>
                             <div>締結日時：{{ $contract->signed_at?->format('Y年m月d日 H:i') ?? '—' }}</div>
                         </div>
+
+                        <a href="{{ route('sign.contracts.pdf', $contract->sign_token) }}"
+                           class="block w-full mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                            契約書PDFをダウンロード
+                        </a>
                     @endif
 
                     @if (isset($contract) && $reason === 'expired')
