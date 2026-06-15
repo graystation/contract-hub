@@ -23,7 +23,6 @@ class ContractTemplateController extends Controller
     {
         return view('contract-templates.create', [
             'template'  => new ContractTemplate(),
-            'types'     => Project::TYPES,
             'variables' => ContractBodyService::VARIABLES,
         ]);
     }
@@ -40,7 +39,6 @@ class ContractTemplateController extends Controller
     {
         return view('contract-templates.edit', [
             'template'  => $contractTemplate,
-            'types'     => Project::TYPES,
             'variables' => ContractBodyService::VARIABLES,
         ]);
     }
@@ -69,7 +67,7 @@ class ContractTemplateController extends Controller
     {
         $projectId      = request('project_id');
         $contractNumber = request('contract_number', '');
-        $contractType   = request('contract_type', $contractTemplate->type ?? '');
+        $contractType   = request('contract_type', '');
 
         if (! $projectId) {
             return response()->json(['body' => $contractTemplate->body]);

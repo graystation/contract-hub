@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ContractTemplateRequest extends FormRequest
 {
@@ -17,7 +15,6 @@ class ContractTemplateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'type'  => ['nullable', Rule::in(array_merge([''], Project::TYPES ?? []))],
             'body'  => ['required', 'string'],
         ];
     }

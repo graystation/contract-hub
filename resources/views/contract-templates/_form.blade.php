@@ -1,7 +1,3 @@
-@php
-$typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
-@endphp
-
 <div class="space-y-5">
     <div>
         <label class="block text-sm font-medium text-gray-700">テンプレート名 <span class="text-red-500">*</span></label>
@@ -10,18 +6,6 @@ $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサル�
                placeholder="例：業務委託契約書"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm @error('title') border-red-500 @enderror">
         @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-    </div>
-
-    <div>
-        <label class="block text-sm font-medium text-gray-700">対象種別</label>
-        <select name="type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm">
-            <option value="">全種別（どの契約種別にも表示）</option>
-            @foreach ($types as $type)
-                <option value="{{ $type }}" {{ old('type', $template->type ?? '') === $type ? 'selected' : '' }}>
-                    {{ $typeLabels[$type] ?? $type }}
-                </option>
-            @endforeach
-        </select>
     </div>
 
     <div>

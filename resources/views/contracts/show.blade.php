@@ -333,6 +333,20 @@ $actionLabels = [
                         <p class="text-sm text-gray-500 mb-4">
                             同意URLを発行すると、ログイン不要で相手が契約内容を確認・同意できます。
                         </p>
+
+                        @if ($contract->project->company->email)
+                            <div class="mb-4 flex items-center gap-3 p-3 bg-violet-50 border border-violet-200 rounded-md">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-medium text-violet-800">メール送信先</p>
+                                    <p class="text-sm text-violet-700 truncate">{{ $contract->project->company->email }}</p>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-md px-3 py-2 mb-4">
+                                顧客のメールアドレスが未登録のため、メール送信できません。
+                            </p>
+                        @endif
+
                         <div class="flex items-center gap-3">
                             <form method="POST" action="{{ route('contracts.sign-url.generate', $contract) }}">
                                 @csrf
@@ -481,6 +495,7 @@ $actionLabels = [
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ファイル名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">対象PDF</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">生成日時</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SHA256（先頭16字）</th>
                                 <th class="px-6 py-3"></th>
@@ -493,6 +508,16 @@ $actionLabels = [
                                         {{ $export->file_name }}
                                         @if ($latestEvidenceExport && $export->id === $latestEvidenceExport->id)
                                             <span class="ml-2 text-xs text-indigo-600 font-sans font-medium">最新</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        @if ($export->contractFile)
+                                            <a href="{{ route('contracts.files.download', [$contract, $export->contractFile]) }}"
+                                               class="text-indigo-600 hover:text-indigo-900 font-mono">
+                                                {{ $export->contractFile->file_name }}
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400">—</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">

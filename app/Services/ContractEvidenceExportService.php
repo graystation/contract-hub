@@ -24,7 +24,7 @@ class ContractEvidenceExportService
      */
     public function getExportsForContract(Contract $contract): Collection
     {
-        return $contract->evidenceExports()->latest()->get();
+        return $contract->evidenceExports()->with('contractFile')->latest()->get();
     }
 
     /**
@@ -86,11 +86,12 @@ class ContractEvidenceExportService
         Storage::disk('contract_evidence')->put($fileName, $zipContent);
 
         $export = ContractEvidenceExport::create([
-            'contract_id'  => $contract->id,
-            'file_name'    => $fileName,
-            'file_path'    => $fileName,
-            'file_hash'    => $zipHash,
-            'generated_at' => $generatedAt,
+            'contract_id'      => $contract->id,
+            'contract_file_id' => $latestPdf->id,
+            'file_name'        => $fileName,
+            'file_path'        => $fileName,
+            'file_hash'        => $zipHash,
+            'generated_at'     => $generatedAt,
         ]);
 
         $this->auditLogService->log(

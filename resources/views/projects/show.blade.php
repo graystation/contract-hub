@@ -104,7 +104,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                         関連契約
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $project->contracts->count() }} 件</span>
                     </h3>
-                    <a href="{{ route('contracts.create') }}"
+                    <a href="{{ route('contracts.create', ['project_id' => $project->id]) }}"
                        class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
                         + 契約を追加
                     </a>

@@ -1,6 +1,6 @@
 @php
 $statusLabels  = ['draft' => '下書き', 'sent' => '送付済', 'signed' => '締結済', 'cancelled' => 'キャンセル'];
-$currentProjectId      = old('project_id',     '');
+$currentProjectId      = old('project_id',     request('project_id', ''));
 $currentContractNumber = old('contract_number', $contractNumber ?? '');
 $currentContractType   = old('contract_type',   '');
 $currentBody           = old('body',            '');

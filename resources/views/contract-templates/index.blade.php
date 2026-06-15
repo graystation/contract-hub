@@ -30,22 +30,15 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">テンプレート名</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">対象種別</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">更新日</th>
                                 <th class="px-6 py-3"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
                             @foreach ($templates as $tpl)
-                                @php
-                                    $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
-                                @endphp
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         {{ $tpl->title }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $tpl->type ? ($typeLabels[$tpl->type] ?? $tpl->type) : '全種別' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $tpl->updated_at->format('Y/m/d') }}

@@ -1,7 +1,3 @@
-@php
-$typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
-@endphp
-
 <x-editor-layout :title="'テンプレート編集 — ' . $template->title">
 
     {{-- x-data wraps everything so toolbar (row 2) and editor share the same Alpine scope --}}
@@ -66,21 +62,6 @@ $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサル�
                            placeholder="例：業務委託契約書"
                            class="block w-full border-0 border-b border-gray-200 focus:border-indigo-400 focus:ring-0 text-xl font-semibold text-gray-900 placeholder-gray-300 py-2 bg-transparent @error('title') border-red-400 @enderror">
                     @error('title') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
-                </div>
-
-                {{-- 対象種別 --}}
-                <div>
-                    <label class="block text-xs font-medium text-gray-400 uppercase tracking-widest mb-3">対象種別</label>
-                    <select name="type"
-                            class="border-gray-200 rounded-md text-sm text-gray-700 focus:border-indigo-400 focus:ring-indigo-400">
-                        <option value="">全種別（どの契約種別にも表示）</option>
-                        @foreach ($types as $type)
-                            <option value="{{ $type }}"
-                                    {{ old('type', $template->type ?? '') === $type ? 'selected' : '' }}>
-                                {{ $typeLabels[$type] ?? $type }}
-                            </option>
-                        @endforeach
-                    </select>
                 </div>
 
                 {{-- 変数チートシート --}}

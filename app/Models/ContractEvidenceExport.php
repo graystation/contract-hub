@@ -12,6 +12,7 @@ class ContractEvidenceExport extends Model
 
     protected $fillable = [
         'contract_id',
+        'contract_file_id',
         'file_name',
         'file_path',
         'file_hash',
@@ -25,5 +26,10 @@ class ContractEvidenceExport extends Model
     public function contract(): BelongsTo
     {
         return $this->belongsTo(Contract::class);
+    }
+
+    public function contractFile(): BelongsTo
+    {
+        return $this->belongsTo(ContractFile::class);
     }
 }
