@@ -123,7 +123,10 @@ class ContractMailService
     public function sendSignedCustomerMail(Contract $contract, ContractFile $contractFile, Request $request): void
     {
         try {
+            $adminEmail = config('mail.contract_admin') ?: config('mail.from.address');
+
             Mail::to($contract->signer_email)
+                ->bcc($adminEmail)
                 ->send(new ContractSignedCustomerMail($contract, $contractFile));
 
             $this->auditLogService->log(
