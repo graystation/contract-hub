@@ -37,12 +37,12 @@
                         </div>
                         <div class="grid grid-cols-3 gap-4">
                             <dt class="text-sm font-medium text-gray-500">顧客名</dt>
-                            <dd class="col-span-2 text-sm text-gray-900">{{ $contract->project->company->company_name }}</dd>
+                            <dd class="col-span-2 text-sm text-gray-900">{{ $contract->project->company->company_name }} 様</dd>
                         </div>
                         @if ($contract->project->company->contact_name)
                         <div class="grid grid-cols-3 gap-4">
                             <dt class="text-sm font-medium text-gray-500">担当者名</dt>
-                            <dd class="col-span-2 text-sm text-gray-900">{{ $contract->project->company->contact_name }}</dd>
+                            <dd class="col-span-2 text-sm text-gray-900">{{ $contract->project->company->contact_name }} 様</dd>
                         </div>
                         @endif
                         <div class="grid grid-cols-3 gap-4">

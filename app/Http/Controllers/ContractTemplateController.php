@@ -22,8 +22,8 @@ class ContractTemplateController extends Controller
     public function create()
     {
         return view('contract-templates.create', [
-            'template'  => new ContractTemplate(),
-            'variables' => ContractBodyService::VARIABLES,
+            'template'       => new ContractTemplate(),
+            'variableGroups' => ContractBodyService::VARIABLE_GROUPS,
         ]);
     }
 
@@ -38,8 +38,8 @@ class ContractTemplateController extends Controller
     public function edit(ContractTemplate $contractTemplate)
     {
         return view('contract-templates.edit', [
-            'template'  => $contractTemplate,
-            'variables' => ContractBodyService::VARIABLES,
+            'template'       => $contractTemplate,
+            'variableGroups' => ContractBodyService::VARIABLE_GROUPS,
         ]);
     }
 

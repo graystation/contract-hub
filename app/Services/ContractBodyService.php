@@ -8,23 +8,51 @@ use App\Models\ContractTemplate;
 class ContractBodyService
 {
     /**
-     * Available template variables and their descriptions.
+     * Available template variables grouped by category (used for the editor UI).
      */
+    public const VARIABLE_GROUPS = [
+        '契約情報' => [
+            '{contract_number}' => '契約番号',
+            '{contract_type}'   => '契約種別',
+            '{today}'           => '今日の日付',
+        ],
+        '案件情報' => [
+            '{project_title}' => '案件名',
+            '{start_date}'    => '案件開始日',
+            '{end_date}'      => '案件終了日',
+        ],
+        '顧客情報' => [
+            '{company_name}'  => '会社名',
+            '{contact_name}'  => '担当者名',
+        ],
+        '運営者情報（甲）' => [
+            '{operator_company}' => '会社名',
+            '{operator_name}'    => '氏名',
+            '{operator_address}' => '住所',
+        ],
+        '署名欄（同意後に反映）（乙）' => [
+            '{signer_name}'    => '同意者氏名',
+            '{signer_address}' => '同意者住所',
+            '{signed_date}'    => '同意日',
+        ],
+    ];
+
+    /** Flat map of all variables — used by resolve() and for validation. */
     public const VARIABLES = [
-        '{company_name}'     => '会社名',
-        '{contact_name}'     => '担当者名',
-        '{project_title}'    => '案件名',
         '{contract_number}'  => '契約番号',
         '{contract_type}'    => '契約種別',
+        '{today}'            => '今日の日付',
+        '{project_title}'    => '案件名',
         '{start_date}'       => '案件開始日',
         '{end_date}'         => '案件終了日',
-        '{today}'            => '今日の日付',
+        '{company_name}'     => '会社名（乙）',
+        '{contact_name}'     => '担当者名（乙）',
         '{operator_company}' => '運営者会社名（甲）',
         '{operator_name}'    => '運営者氏名（甲）',
         '{operator_address}' => '運営者住所（甲）',
-        '{signer_name}'      => '同意者氏名（乙・同意後に反映）',
-        '{signer_address}'   => '同意者住所（乙・同意後に反映）',
-        '{signed_date}'      => '同意日（乙・同意後に反映）',
+        '{signer_name}'      => '同意者氏名（署名欄）',
+        '{signer_address}'   => '同意者住所（署名欄）',
+        '{signed_date}'      => '同意日（署名欄）',
     ];
 
     /**

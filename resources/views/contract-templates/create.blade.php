@@ -65,13 +65,19 @@
 
                 {{-- 変数チートシート --}}
                 <div class="sticky top-[88px] z-30 -mx-6 px-6 py-3 bg-blue-50 border-b border-blue-200 text-xs text-blue-800 shadow-sm">
-                    <p class="font-medium mb-2 max-w-4xl mx-auto">使用できる変数（クリックで挿入）</p>
-                    <div class="flex flex-wrap gap-2 max-w-4xl mx-auto">
-                        @foreach ($variables as $var => $desc)
-                            <button type="button"
-                                    onclick="window._tiptapEditor?.insertText('{{ $var }}'); this.classList.add('ring-1','ring-blue-400'); setTimeout(() => this.classList.remove('ring-1','ring-blue-400'), 500)"
-                                    class="px-2 py-0.5 bg-white border border-blue-300 rounded font-mono hover:bg-blue-100 transition-colors"
-                                    title="{{ $desc }}">{{ $var }}</button>
+                    <div class="max-w-4xl mx-auto space-y-2">
+                        @foreach ($variableGroups as $groupLabel => $vars)
+                            <div class="flex items-start gap-2">
+                                <span class="shrink-0 font-medium text-blue-600 w-36 pt-0.5">{{ $groupLabel }}</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    @foreach ($vars as $var => $desc)
+                                        <button type="button"
+                                                onclick="window._tiptapEditor?.insertText('{{ $var }}'); this.classList.add('ring-1','ring-blue-400'); setTimeout(() => this.classList.remove('ring-1','ring-blue-400'), 500)"
+                                                class="px-2 py-0.5 bg-white border border-blue-300 rounded font-mono hover:bg-blue-100 transition-colors"
+                                                title="{{ $desc }}">{{ $var }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
