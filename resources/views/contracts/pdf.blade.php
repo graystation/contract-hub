@@ -295,10 +295,21 @@
                     <td class="value">{{ $contract->signed_at ? $contract->signed_at->format('Y年m月d日 H:i:s') : '—' }}</td>
                 </tr>
                 <tr>
+                    <td class="label">同意者住所</td>
+                    <td class="value">{{ $contract->signer_address ?? '—' }}</td>
+                </tr>
+                <tr>
                     <td class="label">同意者IPアドレス</td>
                     <td class="value">{{ $contract->signer_ip_address ?? '—' }}</td>
                 </tr>
+                <tr>
+                    <td class="label">ブラウザ情報</td>
+                    <td class="value" style="font-size:7.5pt; word-break:break-all; color:#555;">{{ $contract->signer_user_agent ?? '—' }}</td>
+                </tr>
             </table>
+            <p style="font-size:7.5pt; color:#888; margin-top:6pt;">
+                本契約はSHA256ハッシュ付きの証跡パッケージで管理されています。
+            </p>
         </div>
         @endif
 

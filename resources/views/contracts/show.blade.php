@@ -236,7 +236,7 @@ $actionLabels = [
                     </div>
                 @else
                     <div class="px-6 py-8 text-center text-sm text-gray-400">
-                        PDFが生成されていません。「PDF生成」ボタンから作成してください。
+                        PDFはまだ生成されていません。同意完了後に自動生成されます。
                     </div>
                 @endif
             </div>
@@ -386,10 +386,13 @@ $actionLabels = [
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contract->files->count() }} 件</span>
                     </h3>
                     <div class="flex items-center gap-4">
+                        {{-- ファイル一覧横のプレビューリンク（ヘッダーと同一機能のため無効化中 — 必要な場合はコメントを外す）
                         <a href="{{ route('contracts.pdf.preview', $contract) }}" target="_blank"
                            class="text-sm text-gray-500 hover:text-gray-800 font-medium">
                             プレビュー
                         </a>
+                        --}}
+                        {{-- PDF手動保存ボタン（無効化中 — 必要な場合はコメントを外す）
                         @unless (in_array($contract->status, ['signed', 'cancelled'], true))
                             <form method="POST" action="{{ route('contracts.pdf.store', $contract) }}">
                                 @csrf
@@ -399,6 +402,7 @@ $actionLabels = [
                                 </button>
                             </form>
                         @endunless
+                        --}}
                     </div>
                 </div>
 
