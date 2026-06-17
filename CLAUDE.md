@@ -108,7 +108,7 @@ The UI should prioritize usability and operational efficiency.
 
 ## Tech Stack
 
-- Laravel 12
+- Laravel 13
 - PHP 8.4
 - MySQL
 - Blade
