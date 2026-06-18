@@ -9,7 +9,6 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 
 class ContractSignedNotificationMail extends Mailable
 {
@@ -41,16 +40,16 @@ class ContractSignedNotificationMail extends Mailable
 
     public function attachments(): array
     {
-        $latestFile = $this->contract->files()->latest()->first();
+        $latestExport = $this->contract->evidenceExports()->latest()->first();
 
-        if ($latestFile === null) {
+        if ($latestExport === null) {
             return [];
         }
 
         return [
-            Attachment::fromStorageDisk('contracts', $latestFile->file_path)
-                ->as($latestFile->file_name)
-                ->withMime('application/pdf'),
+            Attachment::fromStorageDisk('contract_evidence', $latestExport->file_path)
+                ->as($latestExport->file_name)
+                ->withMime('application/zip'),
         ];
     }
 }
