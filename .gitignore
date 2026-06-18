@@ -24,7 +24,7 @@
 /storage/app/invoices/*.pdf
 /storage/app/contract-evidence/*.zip
 /storage/backups/
-/storage/fonts/*.ttf
+# /storage/fonts/*.ttf
 /vendor
 _ide_helper.php
 Homestead.json
