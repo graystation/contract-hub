@@ -14,6 +14,7 @@ class ContractSigningService
     public function __construct(
         private ContractFileService $fileService,
         private AuditLogService $auditLogService,
+        private ContractEvidenceExportService $evidenceExportService,
     ) {}
 
     /**
@@ -108,5 +109,9 @@ class ContractSigningService
         // Re-generate PDF to capture signer details in the evidence document
         $contract->refresh()->load('project.company');
         $this->fileService->generateAndStore($contract, $request);
+
+        // Auto-generate evidence ZIP at the moment of consent
+        $contract->refresh()->load(['project.company', 'files']);
+        $this->evidenceExportService->generateEvidenceZip($contract, $request);
     }
 }

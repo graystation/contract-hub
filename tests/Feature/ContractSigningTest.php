@@ -18,6 +18,7 @@ class ContractSigningTest extends TestCase
     {
         parent::setUp();
         Storage::fake('contracts');
+        Storage::fake('contract_evidence');
         $this->admin = User::factory()->create();
     }
 
