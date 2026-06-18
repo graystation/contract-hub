@@ -89,6 +89,13 @@ class ContractController extends Controller
         return redirect()->route('contracts.show', $contract)->with('success', '契約を更新しました。');
     }
 
+    public function duplicate(Contract $contract)
+    {
+        $newContract = $this->service->duplicate($contract);
+
+        return redirect()->route('contracts.edit', $newContract)->with('success', '契約をコピーしました。内容を確認して保存してください。');
+    }
+
     public function destroy(Contract $contract)
     {
         $this->service->delete($contract);

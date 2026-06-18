@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('contract-templates.preview');
     Route::resource('projects', ProjectController::class);
     Route::resource('contracts', ContractController::class);
+    Route::post('contracts/{contract}/duplicate', [ContractController::class, 'duplicate'])
+        ->name('contracts.duplicate');
     Route::resource('invoices', InvoiceController::class);
 
     // Invoice file: PDF generation and download

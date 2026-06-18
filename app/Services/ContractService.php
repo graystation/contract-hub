@@ -32,6 +32,19 @@ class ContractService
         return $contract;
     }
 
+    public function duplicate(Contract $contract): Contract
+    {
+        return Contract::create([
+            'project_id'      => $contract->project_id,
+            'template_id'     => $contract->template_id,
+            'contract_number' => $this->generateContractNumber(),
+            'contract_type'   => $contract->contract_type,
+            'notes'           => $contract->notes,
+            'body'            => $contract->body,
+            'status'          => 'draft',
+        ]);
+    }
+
     public function delete(Contract $contract): void
     {
         $contract->delete();

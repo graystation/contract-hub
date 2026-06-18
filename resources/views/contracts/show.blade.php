@@ -45,6 +45,14 @@ $actionLabels = [
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
                 </a>
+                <form method="POST" action="{{ route('contracts.duplicate', $contract) }}"
+                      onsubmit="return confirm('この契約をコピーして新しいドラフトを作成します。よろしいですか？')">
+                    @csrf
+                    <button type="submit"
+                            class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
+                        コピーして再作成
+                    </button>
+                </form>
                 <form method="POST" action="{{ route('contracts.destroy', $contract) }}"
                       class="ml-4 pl-4 border-l border-gray-300"
                       onsubmit="return confirmContractDelete(event, '{{ $contract->contract_number }}')">
