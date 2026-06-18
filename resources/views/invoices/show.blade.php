@@ -142,6 +142,17 @@ $auditActionLabels = [
                                 </a>
                             </dd>
                         </div>
+                        @if ($invoice->contract)
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">紐づく契約</dt>
+                            <dd class="mt-1 text-sm">
+                                <a href="{{ route('contracts.show', $invoice->contract) }}"
+                                   class="text-indigo-600 hover:text-indigo-900 font-medium">
+                                    {{ $invoice->contract->contract_number }}
+                                </a>
+                            </dd>
+                        </div>
+                        @endif
                     </dl>
                 </div>
             </div>

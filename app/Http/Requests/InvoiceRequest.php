@@ -16,7 +16,8 @@ class InvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'project_id'  => ['required', 'exists:projects,id'],
+            'contract_id' => ['nullable', 'exists:contracts,id'],
             'title'      => ['required', 'string', 'max:255'],
             'amount'     => ['required', 'numeric', 'min:0'],
             'issued_at'  => ['nullable', 'date'],

@@ -550,11 +550,69 @@ $actionLabels = [
                 @endif
             </div>
 
-            {{-- Section 7: Audit logs --}}
+            {{-- Section 7: Related invoices --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        8. 紐づく請求書
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contract->invoices->count() }} 件</span>
+                    </h3>
+                    <a href="{{ route('invoices.create', ['contract_id' => $contract->id]) }}"
+                       class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-md hover:bg-indigo-700">
+                        + この契約から請求書を作成
+                    </a>
+                </div>
+
+                @if ($contract->invoices->isEmpty())
+                    <div class="px-6 py-6 text-center text-sm text-gray-400">紐づく請求書はありません。</div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">請求番号</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">タイトル</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">税込金額</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">発行日</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @foreach ($contract->invoices as $invoice)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm font-mono text-gray-700">{{ $invoice->invoice_number }}</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">{{ $invoice->title }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">{{ fmt_amount($invoice->total_amount) }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm">
+                                            @php
+                                                $badgeClass = match($invoice->status) {
+                                                    'paid'      => 'bg-green-100 text-green-800',
+                                                    'issued'    => 'bg-blue-100 text-blue-800',
+                                                    'cancelled' => 'bg-gray-100 text-gray-500',
+                                                    default     => 'bg-yellow-100 text-yellow-800',
+                                                };
+                                                $statusLabel = ['draft' => '下書き', 'issued' => '請求済', 'paid' => '入金済', 'cancelled' => 'キャンセル'][$invoice->status] ?? $invoice->status;
+                                            @endphp
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $badgeClass }}">{{ $statusLabel }}</span>
+                                        </td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">{{ $invoice->issued_at?->format('Y/m/d') ?? '—' }}</td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-right text-sm">
+                                            <a href="{{ route('invoices.show', $invoice) }}" class="text-indigo-600 hover:text-indigo-800">詳細 →</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Section 8: Audit logs --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        8. 監査ログ
+                        9. 監査ログ
                         <span class="ml-2 text-gray-400 font-normal normal-case">最新{{ $auditLogs->count() }}件</span>
                     </h3>
                 </div>

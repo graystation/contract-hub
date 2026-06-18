@@ -1,21 +1,39 @@
 @php
 $statusLabels = ['draft' => '下書き', 'issued' => '請求済', 'paid' => '入金済', 'cancelled' => 'キャンセル'];
+$selectedProjectId = old('project_id', $invoice->project_id ?? $fromContract?->project_id ?? '');
+$selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?->id ?? '');
 @endphp
 
-<div x-data="{ amount: {{ old('amount', $invoice->amount ?? 0) }} }" class="space-y-5">
+<div x-data="{ amount: {{ old('amount', $invoice->amount ?? 0) }}, selectedProjectId: '{{ $selectedProjectId }}' }" class="space-y-5">
 
     <div>
         <label class="block text-sm font-medium text-gray-700">案件 <span class="text-red-500">*</span></label>
-        <select name="project_id"
+        <select name="project_id" x-model="selectedProjectId"
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm @error('project_id') border-red-500 @enderror">
             <option value="">-- 選択してください --</option>
             @foreach ($projects as $project)
-                <option value="{{ $project->id }}" {{ old('project_id', $invoice->project_id ?? '') == $project->id ? 'selected' : '' }}>
+                <option value="{{ $project->id }}" {{ $selectedProjectId == $project->id ? 'selected' : '' }}>
                     {{ $project->company->company_name }} / {{ $project->title }}
                 </option>
             @endforeach
         </select>
         @error('project_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700">紐づく契約（任意）</label>
+        <select name="contract_id"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm @error('contract_id') border-red-500 @enderror">
+            <option value="">-- 選択しない --</option>
+            @foreach ($contracts as $contract)
+                <template x-if="selectedProjectId == '{{ $contract->project_id }}'">
+                    <option value="{{ $contract->id }}" {{ $selectedContractId == $contract->id ? 'selected' : '' }}>
+                        {{ $contract->contract_number }} — {{ $contract->project->company->company_name }}
+                    </option>
+                </template>
+            @endforeach
+        </select>
+        @error('contract_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
 
     <div>

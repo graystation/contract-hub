@@ -13,6 +13,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'project_id',
+        'contract_id',
         'invoice_number',
         'title',
         'amount',
@@ -41,6 +42,11 @@ class Invoice extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(Contract::class);
     }
 
     public function payments(): HasMany

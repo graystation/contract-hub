@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\InvoiceRequest;
 use App\Models\AuditLog;
+use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Services\InvoiceFileService;
@@ -24,12 +25,18 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $fromContract = $request->contract_id
+            ? Contract::with('project.company')->find($request->contract_id)
+            : null;
+
         return view('invoices.create', [
-            'projects'       => Project::with('company')->orderByDesc('created_at')->get(),
-            'statuses'       => Invoice::STATUSES,
-            'invoiceNumber'  => $this->service->generateInvoiceNumber(),
+            'projects'      => Project::with('company')->orderByDesc('created_at')->get(),
+            'contracts'     => Contract::with('project.company')->orderByDesc('created_at')->get(),
+            'statuses'      => Invoice::STATUSES,
+            'invoiceNumber' => $this->service->generateInvoiceNumber(),
+            'fromContract'  => $fromContract,
         ]);
     }
 
@@ -42,7 +49,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice, Request $request)
     {
-        $invoice->load('project.company', 'payments', 'files');
+        $invoice->load('project.company', 'contract', 'payments', 'files');
 
         $latestPdf  = $this->fileService->getLatestPdf($invoice);
         $paymentIds = $invoice->payments->pluck('id');
@@ -68,9 +75,10 @@ class InvoiceController extends Controller
         );
 
         return view('invoices.edit', [
-            'invoice'  => $invoice,
-            'projects' => Project::with('company')->orderByDesc('created_at')->get(),
-            'statuses' => Invoice::STATUSES,
+            'invoice'   => $invoice,
+            'projects'  => Project::with('company')->orderByDesc('created_at')->get(),
+            'contracts' => Contract::with('project.company')->orderByDesc('created_at')->get(),
+            'statuses'  => Invoice::STATUSES,
         ]);
     }
 
