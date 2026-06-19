@@ -280,6 +280,27 @@
             </table>
         </div>
 
+        {{-- Bank transfer info --}}
+        @if (config('contract.bank_name'))
+            <div class="section">
+                <div class="section-title">お振込先</div>
+                <table class="dl">
+                    <tr>
+                        <td class="label">金融機関</td>
+                        <td class="value">{{ config('contract.bank_name') }}　{{ config('contract.bank_branch') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">口座種別・番号</td>
+                        <td class="value">{{ config('contract.bank_account_type') }}　{{ config('contract.bank_account_number') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">口座名義</td>
+                        <td class="value">{{ config('contract.bank_account_name') }}</td>
+                    </tr>
+                </table>
+            </div>
+        @endif
+
         {{-- Notes --}}
         @if ($invoice->notes)
             <div class="section">
