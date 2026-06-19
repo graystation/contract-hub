@@ -78,14 +78,14 @@ $selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?
         <div>
             <label class="block text-sm font-medium text-gray-700">発行日</label>
             <input type="date" name="issued_at"
-                   value="{{ old('issued_at', isset($invoice) ? $invoice->issued_at?->format('Y-m-d') : '') }}"
+                   value="{{ old('issued_at', isset($invoice) ? $invoice->issued_at?->format('Y-m-d') : now()->format('Y-m-d')) }}"
                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm">
             @error('issued_at') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700">支払期限</label>
             <input type="date" name="due_date"
-                   value="{{ old('due_date', isset($invoice) ? $invoice->due_date?->format('Y-m-d') : '') }}"
+                   value="{{ old('due_date', isset($invoice) ? $invoice->due_date?->format('Y-m-d') : now()->addDays(7)->format('Y-m-d')) }}"
                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm">
             @error('due_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
