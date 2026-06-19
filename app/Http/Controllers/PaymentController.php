@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Services\InvoiceFileService;
 use App\Services\PaymentService;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentService $service) {}
+    public function __construct(
+        private PaymentService $service,
+        private InvoiceFileService $fileService,
+    ) {}
 
     public function store(Invoice $invoice, PaymentRequest $request)
     {
@@ -20,12 +24,17 @@ class PaymentController extends Controller
 
     public function edit(Payment $payment)
     {
-        $payment->load('invoice.project.company');
+        $payment->load('invoice.project.company', 'invoice.payments', 'invoice.files', 'invoice.contract');
+
+        $invoice = $payment->invoice;
 
         return view('invoices.show', [
-            'invoice'       => $payment->invoice,
+            'invoice'        => $invoice,
             'editingPayment' => $payment,
-            'auditLogs'     => collect(),
+            'latestPdf'      => $this->fileService->getLatestPdf($invoice),
+            'latestReceipt'  => $this->fileService->getLatestReceipt($invoice),
+            'receipts'       => $this->fileService->getReceipts($invoice),
+            'auditLogs'      => collect(),
         ]);
     }
 
