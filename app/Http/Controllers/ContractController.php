@@ -18,10 +18,15 @@ class ContractController extends Controller
         private ContractEvidenceExportService $evidenceExportService,
     ) {}
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        $sort = $request->query('sort', 'created_at');
+        $dir  = $request->query('dir', 'desc');
+
         return view('contracts.index', [
-            'contracts' => $this->service->paginate(),
+            'contracts' => $this->service->paginate(sort: $sort, dir: $dir),
+            'sort'      => $sort,
+            'dir'       => $dir,
         ]);
     }
 

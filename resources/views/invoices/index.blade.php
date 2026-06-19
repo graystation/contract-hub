@@ -1,3 +1,8 @@
+@php
+$s = fn(string $col) => request()->fullUrlWithQuery(['sort' => $col, 'dir' => ($sort === $col && $dir === 'asc') ? 'desc' : 'asc']);
+$i = fn(string $col) => $sort === $col ? ($dir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -23,15 +28,25 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">請求番号</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <a href="{{ $s('invoice_number') }}" class="hover:text-gray-800">請求番号{{ $i('invoice_number') }}</a>
+                            </th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">顧客 / 案件</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">税込合計</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                <a href="{{ $s('total_amount') }}" class="hover:text-gray-800">税込合計{{ $i('total_amount') }}</a>
+                            </th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">入金済</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">未入金</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状態</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">発行日</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">支払期限</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <a href="{{ $s('status') }}" class="hover:text-gray-800">状態{{ $i('status') }}</a>
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <a href="{{ $s('issued_at') }}" class="hover:text-gray-800">発行日{{ $i('issued_at') }}</a>
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <a href="{{ $s('due_date') }}" class="hover:text-gray-800">支払期限{{ $i('due_date') }}</a>
+                            </th>
                             <th class="px-4 py-3"></th>
                         </tr>
                     </thead>

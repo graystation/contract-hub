@@ -12,10 +12,14 @@ class InvoiceService
 
     public function __construct(private AuditLogService $auditLogService) {}
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(int $perPage = 15, string $sort = 'created_at', string $dir = 'desc'): LengthAwarePaginator
     {
+        $allowed = ['invoice_number', 'status', 'total_amount', 'issued_at', 'due_date', 'created_at'];
+        $sort    = in_array($sort, $allowed) ? $sort : 'created_at';
+        $dir     = $dir === 'asc' ? 'asc' : 'desc';
+
         return Invoice::with('project.company', 'payments')
-            ->orderByDesc('created_at')
+            ->orderBy($sort, $dir)
             ->paginate($perPage);
     }
 

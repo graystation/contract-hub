@@ -18,10 +18,15 @@ class InvoiceController extends Controller
         private InvoiceFileService $fileService,
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
+        $sort = $request->query('sort', 'created_at');
+        $dir  = $request->query('dir', 'desc');
+
         return view('invoices.index', [
-            'invoices' => $this->service->paginate(),
+            'invoices' => $this->service->paginate(sort: $sort, dir: $dir),
+            'sort'     => $sort,
+            'dir'      => $dir,
         ]);
     }
 
