@@ -53,6 +53,7 @@ class InvoiceController extends Controller
 
         $latestPdf     = $this->fileService->getLatestPdf($invoice);
         $latestReceipt = $this->fileService->getLatestReceipt($invoice);
+        $receipts      = $this->fileService->getReceipts($invoice);
         $paymentIds = $invoice->payments->pluck('id');
 
         $auditLogs = AuditLog::where(function ($q) use ($invoice, $paymentIds) {
@@ -64,7 +65,7 @@ class InvoiceController extends Controller
             }
         })->latest()->limit(20)->get();
 
-        return view('invoices.show', compact('invoice', 'latestPdf', 'latestReceipt', 'auditLogs'));
+        return view('invoices.show', compact('invoice', 'latestPdf', 'latestReceipt', 'receipts', 'auditLogs'));
     }
 
     public function edit(Invoice $invoice)

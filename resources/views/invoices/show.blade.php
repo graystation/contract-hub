@@ -338,8 +338,46 @@ $auditActionLabels = [
             @if ($invoice->status === 'paid')
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 border-green-500">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">7. 領収書</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        7. 領収書
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $receipts->count() }} 件</span>
+                    </h3>
                 </div>
+
+                {{-- Receipt history --}}
+                @if ($receipts->isNotEmpty())
+                    <div class="overflow-x-auto border-b border-gray-100">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ファイル名</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">発行日時</th>
+                                    <th class="px-6 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @foreach ($receipts as $receipt)
+                                    <tr class="hover:bg-gray-50 {{ $loop->first ? 'bg-green-50' : '' }}">
+                                        <td class="px-6 py-3 text-sm font-mono text-gray-900">
+                                            {{ $receipt->file_name }}
+                                            @if ($loop->first)
+                                                <span class="ml-2 text-xs text-green-600 font-sans">最新</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">
+                                            {{ $receipt->created_at->format('Y/m/d H:i') }}
+                                        </td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-right text-sm">
+                                            <a href="{{ route('invoices.files.download', [$invoice, $receipt]) }}"
+                                               class="text-indigo-600 hover:text-indigo-900 font-medium">ダウンロード</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+
                 <div class="p-6 space-y-4">
                     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                         <div>
@@ -348,18 +386,6 @@ $auditActionLabels = [
                                 {{ $invoice->project->company->email ?: '未登録' }}
                                 <a href="{{ route('companies.edit', $invoice->project->company) }}"
                                    class="text-xs text-indigo-600 hover:text-indigo-800">変更 →</a>
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">直近の発行</dt>
-                            <dd class="mt-1 text-sm text-gray-900">
-                                @if ($latestReceipt)
-                                    <span class="text-green-700">{{ $latestReceipt->created_at->format('Y/m/d H:i') }}</span>
-                                    <a href="{{ route('invoices.files.download', [$invoice, $latestReceipt]) }}"
-                                       class="ml-2 text-xs text-indigo-600 hover:text-indigo-800">ダウンロード</a>
-                                @else
-                                    <span class="text-gray-400">未発行</span>
-                                @endif
                             </dd>
                         </div>
                     </dl>
@@ -377,13 +403,12 @@ $auditActionLabels = [
                                     領収書を発行してメール送信する
                                 </button>
                             </form>
+                        @else
+                            <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
+                                ⚠ 顧客のメールアドレスが未登録のため送信できません。
+                            </p>
                         @endif
                     </div>
-                    @if (! $invoice->project->company->email)
-                        <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
-                            ⚠ 顧客のメールアドレスが未登録のため送信できません。
-                        </p>
-                    @endif
                 </div>
             </div>
             @endif

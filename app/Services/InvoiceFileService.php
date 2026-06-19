@@ -101,6 +101,17 @@ class InvoiceFileService
     }
 
     /**
+     * Return all receipts for the given invoice, newest first.
+     */
+    public function getReceipts(Invoice $invoice)
+    {
+        return $invoice->files()
+            ->where('file_type', 'receipt')
+            ->latest()
+            ->get();
+    }
+
+    /**
      * Generate an invoice PDF for preview without persisting it to storage.
      */
     public function preview(Invoice $invoice): string
