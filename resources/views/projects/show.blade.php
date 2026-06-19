@@ -1,5 +1,15 @@
 @php
-$typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
+$typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
+
+function sortUrl(string $sortParam, string $dirParam, string $column, string $currentSort, string $currentDir): string {
+    $newDir = ($currentSort === $column && $currentDir === 'asc') ? 'desc' : 'asc';
+    return request()->fullUrlWithQuery([$sortParam => $column, $dirParam => $newDir]);
+}
+
+function sortIcon(string $column, string $currentSort, string $currentDir): string {
+    if ($currentSort !== $column) return ' ↕';
+    return $currentDir === 'asc' ? ' ↑' : ' ↓';
+}
 @endphp
 
 <x-app-layout>
@@ -102,7 +112,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                         関連契約
-                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $project->contracts->count() }} 件</span>
+                        <span class="ml-2 text-gray-400 font-normal normal-case">{{ $contracts->count() }} 件</span>
                     </h3>
                     <a href="{{ route('contracts.create', ['project_id' => $project->id]) }}"
                        class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
@@ -110,7 +120,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                     </a>
                 </div>
 
-                @if ($project->contracts->isEmpty())
+                @if ($contracts->isEmpty())
                     <div class="px-6 py-8 text-center text-sm text-gray-400">
                         契約が登録されていません。
                     </div>
@@ -119,14 +129,26 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約番号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'contract_number', $contractSort, $contractDir) }}" class="hover:text-gray-800">
+                                        契約番号{{ sortIcon('contract_number', $contractSort, $contractDir) }}
+                                    </a>
+                                </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約種別</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ステータス</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">締結日</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'status', $contractSort, $contractDir) }}" class="hover:text-gray-800">
+                                        ステータス{{ sortIcon('status', $contractSort, $contractDir) }}
+                                    </a>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'signed_at', $contractSort, $contractDir) }}" class="hover:text-gray-800">
+                                        締結日{{ sortIcon('signed_at', $contractSort, $contractDir) }}
+                                    </a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
-                            @foreach ($project->contracts as $contract)
+                            @foreach ($contracts as $contract)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <a href="{{ route('contracts.show', $contract) }}"
@@ -171,12 +193,28 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">請求番号</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">紐づく契約</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'invoice_number', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
+                                        請求番号{{ sortIcon('invoice_number', $invoiceSort, $invoiceDir) }}
+                                    </a>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'contract_id', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
+                                        紐づく契約{{ sortIcon('contract_id', $invoiceSort, $invoiceDir) }}
+                                    </a>
+                                </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">税込合計</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'total_amount', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
+                                        税込合計{{ sortIcon('total_amount', $invoiceSort, $invoiceDir) }}
+                                    </a>
+                                </th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">入金済</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ステータス</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'status', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
+                                        ステータス{{ sortIcon('status', $invoiceSort, $invoiceDir) }}
+                                    </a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">

@@ -6,6 +6,7 @@ use App\Http\Requests\ProjectRequest;
 use App\Models\Company;
 use App\Models\Project;
 use App\Services\ProjectService;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
@@ -34,13 +35,27 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', '案件を登録しました。');
     }
 
-    public function show(Project $project)
+    public function show(Project $project, Request $request)
     {
-        $project->load('company', 'contracts');
+        // Contract sort
+        $contractSort = $request->query('contract_sort', 'created_at');
+        $contractDir  = $request->query('contract_dir', 'desc');
+        $contractSort = in_array($contractSort, ['contract_number', 'status', 'signed_at', 'created_at']) ? $contractSort : 'created_at';
+        $contractDir  = $contractDir === 'asc' ? 'asc' : 'desc';
 
-        $invoices = $project->invoices()->with('payments', 'contract')->get();
+        $contracts = $project->contracts()->orderBy($contractSort, $contractDir)->get();
 
-        return view('projects.show', compact('project', 'invoices'));
+        // Invoice sort
+        $invoiceSort = $request->query('invoice_sort', 'created_at');
+        $invoiceDir  = $request->query('invoice_dir', 'desc');
+        $invoiceSort = in_array($invoiceSort, ['invoice_number', 'contract_id', 'total_amount', 'status', 'issued_at', 'due_date', 'created_at']) ? $invoiceSort : 'created_at';
+        $invoiceDir  = $invoiceDir === 'asc' ? 'asc' : 'desc';
+
+        $invoices = $project->invoices()->with('payments', 'contract')->orderBy($invoiceSort, $invoiceDir)->get();
+
+        $project->load('company');
+
+        return view('projects.show', compact('project', 'contracts', 'invoices', 'contractSort', 'contractDir', 'invoiceSort', 'invoiceDir'));
     }
 
     public function edit(Project $project)
