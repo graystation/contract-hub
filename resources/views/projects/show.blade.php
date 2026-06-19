@@ -1,15 +1,17 @@
 @php
 $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
 
-function sortUrl(string $sortParam, string $dirParam, string $column, string $currentSort, string $currentDir): string {
-    $newDir = ($currentSort === $column && $currentDir === 'asc') ? 'desc' : 'asc';
-    return request()->fullUrlWithQuery([$sortParam => $column, $dirParam => $newDir]);
-}
+$cSort = fn(string $col) => request()->fullUrlWithQuery([
+    'contract_sort' => $col,
+    'contract_dir'  => ($contractSort === $col && $contractDir === 'asc') ? 'desc' : 'asc',
+]);
+$cIcon = fn(string $col) => $contractSort === $col ? ($contractDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
 
-function sortIcon(string $column, string $currentSort, string $currentDir): string {
-    if ($currentSort !== $column) return ' ↕';
-    return $currentDir === 'asc' ? ' ↑' : ' ↓';
-}
+$iSort = fn(string $col) => request()->fullUrlWithQuery([
+    'invoice_sort' => $col,
+    'invoice_dir'  => ($invoiceSort === $col && $invoiceDir === 'asc') ? 'desc' : 'asc',
+]);
+$iIcon = fn(string $col) => $invoiceSort === $col ? ($invoiceDir === 'asc' ? ' ↑' : ' ↓') : ' ↕';
 @endphp
 
 <x-app-layout>
@@ -130,19 +132,19 @@ function sortIcon(string $column, string $currentSort, string $currentDir): stri
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'contract_number', $contractSort, $contractDir) }}" class="hover:text-gray-800">
-                                        契約番号{{ sortIcon('contract_number', $contractSort, $contractDir) }}
+                                    <a href="{{ $cSort('contract_number') }}" class="hover:text-gray-800">
+                                        契約番号{{ $cIcon('contract_number') }}
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">契約種別</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'status', $contractSort, $contractDir) }}" class="hover:text-gray-800">
-                                        ステータス{{ sortIcon('status', $contractSort, $contractDir) }}
+                                    <a href="{{ $cSort('status') }}" class="hover:text-gray-800">
+                                        ステータス{{ $cIcon('status') }}
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <a href="{{ sortUrl('contract_sort', 'contract_dir', 'signed_at', $contractSort, $contractDir) }}" class="hover:text-gray-800">
-                                        締結日{{ sortIcon('signed_at', $contractSort, $contractDir) }}
+                                    <a href="{{ $cSort('signed_at') }}" class="hover:text-gray-800">
+                                        締結日{{ $cIcon('signed_at') }}
                                     </a>
                                 </th>
                             </tr>
@@ -194,25 +196,25 @@ function sortIcon(string $column, string $currentSort, string $currentDir): stri
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'invoice_number', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
-                                        請求番号{{ sortIcon('invoice_number', $invoiceSort, $invoiceDir) }}
+                                    <a href="{{ $iSort('invoice_number') }}" class="hover:text-gray-800">
+                                        請求番号{{ $iIcon('invoice_number') }}
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'contract_id', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
-                                        紐づく契約{{ sortIcon('contract_id', $invoiceSort, $invoiceDir) }}
+                                    <a href="{{ $iSort('contract_id') }}" class="hover:text-gray-800">
+                                        紐づく契約{{ $iIcon('contract_id') }}
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'total_amount', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
-                                        税込合計{{ sortIcon('total_amount', $invoiceSort, $invoiceDir) }}
+                                    <a href="{{ $iSort('total_amount') }}" class="hover:text-gray-800">
+                                        税込合計{{ $iIcon('total_amount') }}
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">入金済</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    <a href="{{ sortUrl('invoice_sort', 'invoice_dir', 'status', $invoiceSort, $invoiceDir) }}" class="hover:text-gray-800">
-                                        ステータス{{ sortIcon('status', $invoiceSort, $invoiceDir) }}
+                                    <a href="{{ $iSort('status') }}" class="hover:text-gray-800">
+                                        ステータス{{ $iIcon('status') }}
                                     </a>
                                 </th>
                             </tr>
