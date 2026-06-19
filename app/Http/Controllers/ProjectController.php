@@ -43,7 +43,7 @@ class ProjectController extends Controller
         $contractSort = in_array($contractSort, ['contract_number', 'status', 'signed_at', 'created_at']) ? $contractSort : 'created_at';
         $contractDir  = $contractDir === 'asc' ? 'asc' : 'desc';
 
-        $contracts = $project->contracts()->orderBy($contractSort, $contractDir)->get();
+        $contracts = $project->contracts()->reorder($contractSort, $contractDir)->get();
 
         // Invoice sort
         $invoiceSort = $request->query('invoice_sort', 'created_at');
@@ -51,7 +51,7 @@ class ProjectController extends Controller
         $invoiceSort = in_array($invoiceSort, ['invoice_number', 'contract_id', 'total_amount', 'status', 'issued_at', 'due_date', 'created_at']) ? $invoiceSort : 'created_at';
         $invoiceDir  = $invoiceDir === 'asc' ? 'asc' : 'desc';
 
-        $invoices = $project->invoices()->with('payments', 'contract')->orderBy($invoiceSort, $invoiceDir)->get();
+        $invoices = $project->invoices()->with('payments', 'contract')->reorder($invoiceSort, $invoiceDir)->get();
 
         $project->load('company');
 
