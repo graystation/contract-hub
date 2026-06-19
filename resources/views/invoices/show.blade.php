@@ -48,6 +48,18 @@ $auditActionLabels = [
                    class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
                     一覧へ戻る
                 </a>
+                @if (! in_array($invoice->status, ['paid', 'cancelled'], true) && $invoice->payments->isEmpty())
+                    <form method="POST" action="{{ route('invoices.destroy', $invoice) }}"
+                          class="ml-4 pl-4 border-l border-gray-300"
+                          onsubmit="return confirm('「{{ $invoice->invoice_number }}」を削除します。この操作は取り消せません。よろしいですか？')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="px-4 py-2 bg-white border border-red-300 text-red-600 text-sm font-medium rounded-md hover:bg-red-50">
+                            削除
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </x-slot>
