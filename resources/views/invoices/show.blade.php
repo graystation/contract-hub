@@ -299,8 +299,10 @@ $auditActionLabels = [
                             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
                                 <div>
                                     <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">送信先</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">
+                                    <dd class="mt-1 text-sm text-gray-900 flex items-center gap-2">
                                         {{ $invoice->project->company->email }}
+                                        <a href="{{ route('companies.edit', $invoice->project->company) }}"
+                                           class="text-xs text-indigo-600 hover:text-indigo-800">変更 →</a>
                                     </dd>
                                 </div>
                                 <div>
