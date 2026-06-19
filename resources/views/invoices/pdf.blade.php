@@ -192,14 +192,10 @@
                     <strong>支払期限</strong>&nbsp;
                     {{ $invoice->due_date ? $invoice->due_date->format('Y年m月d日') : '—' }}
                     <br>
+                    @if ($invoice->status === 'paid')
                     <strong>ステータス</strong>&nbsp;
-                    @php
-                        $statusMap = ['draft' => '下書き', 'issued' => '請求済', 'paid' => '入金済', 'cancelled' => 'キャンセル'];
-                        $badgeMap  = ['draft' => 'draft', 'issued' => 'issued', 'paid' => 'paid', 'cancelled' => 'cancelled'];
-                    @endphp
-                    <span class="badge badge-{{ $badgeMap[$invoice->status] ?? 'draft' }}">
-                        {{ $statusMap[$invoice->status] ?? $invoice->status }}
-                    </span>
+                    <span class="badge badge-paid">入金済</span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -292,20 +288,17 @@
                         <td>税込合計</td>
                         <td class="right">{{ fmt_amount($invoice->total_amount) }}</td>
                     </tr>
-                    <tr class="paid-row">
-                        <td>入金済額</td>
-                        <td class="right">{{ fmt_amount($invoice->paid_amount) }}</td>
-                    </tr>
-                    @if ($invoice->is_overpaid)
-                        <tr class="over-row">
-                            <td>過入金額</td>
-                            <td class="right">{{ fmt_amount($invoice->overpaid_amount) }}</td>
+                    @if ($invoice->status === 'paid')
+                        <tr class="paid-row">
+                            <td>入金済額</td>
+                            <td class="right">{{ fmt_amount($invoice->paid_amount) }}</td>
                         </tr>
-                    @else
-                        <tr class="unpaid-row">
-                            <td>未入金額</td>
-                            <td class="right">{{ fmt_amount($invoice->unpaid_amount) }}</td>
-                        </tr>
+                        @if ($invoice->is_overpaid)
+                            <tr class="over-row">
+                                <td>過入金額</td>
+                                <td class="right">{{ fmt_amount($invoice->overpaid_amount) }}</td>
+                            </tr>
+                        @endif
                     @endif
                 </tfoot>
             </table>
