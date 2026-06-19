@@ -172,6 +172,7 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">請求番号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">紐づく契約</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">タイトル</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">税込合計</th>
                                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">入金済</th>
@@ -186,6 +187,16 @@ $typeLabels   = ['advertisement' => '広告掲載', 'consulting' => 'コンサ�
                                            class="text-indigo-600 hover:text-indigo-900 font-medium text-sm">
                                             {{ $inv->invoice_number }}
                                         </a>
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm">
+                                        @if ($inv->contract)
+                                            <a href="{{ route('contracts.show', $inv->contract) }}"
+                                               class="text-indigo-600 hover:text-indigo-900 text-xs font-mono">
+                                                {{ $inv->contract->contract_number }}
+                                            </a>
+                                        @else
+                                            <span class="text-gray-300">—</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">{{ $inv->title }}</td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900">

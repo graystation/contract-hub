@@ -38,7 +38,7 @@ class ProjectController extends Controller
     {
         $project->load('company', 'contracts');
 
-        $invoices = $project->invoices()->with('payments')->get();
+        $invoices = $project->invoices()->with('payments', 'contract')->get();
 
         return view('projects.show', compact('project', 'invoices'));
     }
