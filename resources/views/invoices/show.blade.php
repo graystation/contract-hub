@@ -363,17 +363,23 @@ $auditActionLabels = [
                             </dd>
                         </div>
                     </dl>
-                    @if ($invoice->project->company->email)
-                        <form method="POST" action="{{ route('invoices.mail.send-receipt', $invoice) }}"
-                              class="pt-3 border-t border-gray-100"
-                              onsubmit="return confirm('領収書を生成してメール送信します。よろしいですか？')">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
-                                領収書を発行してメール送信する
-                            </button>
-                        </form>
-                    @else
+                    <div class="pt-3 border-t border-gray-100 flex items-center gap-3">
+                        <a href="{{ route('invoices.receipt.preview', $invoice) }}" target="_blank"
+                           class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
+                            領収書プレビュー
+                        </a>
+                        @if ($invoice->project->company->email)
+                            <form method="POST" action="{{ route('invoices.mail.send-receipt', $invoice) }}"
+                                  onsubmit="return confirm('領収書を生成してメール送信します。よろしいですか？')">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+                                    領収書を発行してメール送信する
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                    @if (! $invoice->project->company->email)
                         <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
                             ⚠ 顧客のメールアドレスが未登録のため送信できません。
                         </p>

@@ -46,6 +46,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('invoices.pdf.store');
     Route::get('invoices/{invoice}/pdf/preview', [InvoiceFileController::class, 'preview'])
         ->name('invoices.pdf.preview');
+    Route::get('invoices/{invoice}/receipt/preview', [InvoiceFileController::class, 'previewReceipt'])
+        ->name('invoices.receipt.preview');
     Route::get('invoices/{invoice}/files/{invoiceFile}/download', [InvoiceFileController::class, 'download'])
         ->name('invoices.files.download');
 

@@ -31,7 +31,7 @@ class InvoiceFileController extends Controller
     }
 
     /**
-     * Stream a preview PDF inline without saving.
+     * Stream an invoice preview PDF inline without saving.
      */
     public function preview(Invoice $invoice)
     {
@@ -40,6 +40,19 @@ class InvoiceFileController extends Controller
         return response($pdfContent, 200, [
             'Content-Type'        => 'application/pdf',
             'Content-Disposition' => 'inline; filename="preview.pdf"',
+        ]);
+    }
+
+    /**
+     * Stream a receipt preview PDF inline without saving.
+     */
+    public function previewReceipt(Invoice $invoice)
+    {
+        $pdfContent = $this->service->previewReceipt($invoice);
+
+        return response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="receipt-preview.pdf"',
         ]);
     }
 

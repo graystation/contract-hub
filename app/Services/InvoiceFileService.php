@@ -101,13 +101,25 @@ class InvoiceFileService
     }
 
     /**
-     * Generate a PDF for preview without persisting it to storage.
+     * Generate an invoice PDF for preview without persisting it to storage.
      */
     public function preview(Invoice $invoice): string
     {
         $invoice->loadMissing('project.company', 'payments');
 
         return $this->generatePdfContent($invoice);
+    }
+
+    /**
+     * Generate a receipt PDF for preview without persisting it to storage.
+     */
+    public function previewReceipt(Invoice $invoice): string
+    {
+        $invoice->loadMissing('project.company', 'payments');
+
+        return Pdf::loadView('invoices.receipt-pdf', compact('invoice'))
+            ->setPaper('a4', 'portrait')
+            ->output();
     }
 
     /**
