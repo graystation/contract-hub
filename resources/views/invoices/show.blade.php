@@ -426,7 +426,7 @@ $auditActionLabels = [
             @endif
 
             {{-- Section 8 (or 7 when not paid): Payments --}}
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+            <div id="payment-form" class="bg-white shadow-sm sm:rounded-lg overflow-hidden {{ isset($editingPayment) ? 'ring-2 ring-indigo-400' : '' }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                         7. 入金一覧
@@ -563,4 +563,10 @@ $auditActionLabels = [
 
         </div>
     </div>
+
+    @isset($editingPayment)
+    <script>
+        document.getElementById('payment-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    </script>
+    @endisset
 </x-app-layout>
