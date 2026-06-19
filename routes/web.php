@@ -52,6 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Invoice mail: send invoice PDF to customer
     Route::post('invoices/{invoice}/send-mail', [InvoiceMailController::class, 'send'])
         ->name('invoices.mail.send');
+    Route::post('invoices/{invoice}/send-receipt', [InvoiceMailController::class, 'sendReceipt'])
+        ->name('invoices.mail.send-receipt');
 
     // Payments: nested under invoice for store, standalone for edit/update/destroy
     Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])

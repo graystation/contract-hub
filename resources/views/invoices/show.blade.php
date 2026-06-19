@@ -6,6 +6,9 @@ $auditActionLabels = [
     'invoice_pdf_generated'            => '請求書PDF生成',
     'invoice_mail_sent'                => '請求書メール送信',
     'invoice_mail_failed'              => '請求書メール送信失敗',
+    'invoice_receipt_generated'        => '領収書PDF生成',
+    'invoice_receipt_mail_sent'        => '領収書メール送信',
+    'invoice_receipt_mail_failed'      => '領収書メール送信失敗',
     'payment_created'                  => '入金登録',
     'payment_updated'                  => '入金更新',
     'payment_deleted'                  => '入金削除',
@@ -331,7 +334,55 @@ $auditActionLabels = [
                 </div>
             </div>
 
-            {{-- Section 7: Payments --}}
+            {{-- Section 7: Receipt --}}
+            @if ($invoice->status === 'paid')
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 border-green-500">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">7. 領収書</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">送信先</dt>
+                            <dd class="mt-1 text-sm text-gray-900 flex items-center gap-2">
+                                {{ $invoice->project->company->email ?: '未登録' }}
+                                <a href="{{ route('companies.edit', $invoice->project->company) }}"
+                                   class="text-xs text-indigo-600 hover:text-indigo-800">変更 →</a>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">直近の発行</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                @if ($latestReceipt)
+                                    <span class="text-green-700">{{ $latestReceipt->created_at->format('Y/m/d H:i') }}</span>
+                                    <a href="{{ route('invoices.files.download', [$invoice, $latestReceipt]) }}"
+                                       class="ml-2 text-xs text-indigo-600 hover:text-indigo-800">ダウンロード</a>
+                                @else
+                                    <span class="text-gray-400">未発行</span>
+                                @endif
+                            </dd>
+                        </div>
+                    </dl>
+                    @if ($invoice->project->company->email)
+                        <form method="POST" action="{{ route('invoices.mail.send-receipt', $invoice) }}"
+                              class="pt-3 border-t border-gray-100"
+                              onsubmit="return confirm('領収書を生成してメール送信します。よろしいですか？')">
+                            @csrf
+                            <button type="submit"
+                                    class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700">
+                                領収書を発行してメール送信する
+                            </button>
+                        </form>
+                    @else
+                        <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-3 py-2">
+                            ⚠ 顧客のメールアドレスが未登録のため送信できません。
+                        </p>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            {{-- Section 8 (or 7 when not paid): Payments --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">

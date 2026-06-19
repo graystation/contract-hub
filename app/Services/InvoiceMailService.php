@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\InvoiceReceiptMail;
 use App\Mail\InvoiceSendMail;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
@@ -68,6 +69,57 @@ class InvoiceMailService
             }
 
             throw new \RuntimeException('メール送信に失敗しました。');
+        }
+    }
+
+    /**
+     * Generate a receipt PDF and send it to the customer.
+     *
+     * @throws \RuntimeException When the company has no email, or when mail sending fails.
+     */
+    public function sendReceipt(Invoice $invoice, Request $request): void
+    {
+        $invoice->loadMissing('project.company', 'payments', 'files');
+
+        if (! $invoice->project->company->email) {
+            throw new \RuntimeException('送信先メールアドレスが登録されていません。');
+        }
+
+        $receiptFile = $this->fileService->generateAndStoreReceipt($invoice, $request);
+
+        try {
+            Mail::to($invoice->project->company->email)
+                ->send(new InvoiceReceiptMail($invoice, $receiptFile));
+
+            $this->auditLogService->log(
+                action: 'invoice_receipt_mail_sent',
+                targetType: 'invoice',
+                targetId: $invoice->id,
+                request: $request,
+            );
+        } catch (\Throwable $e) {
+            Log::error('Failed to send invoice receipt mail', [
+                'invoice_id'     => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'mail_type'      => InvoiceReceiptMail::class,
+                'error'          => $e->getMessage(),
+            ]);
+
+            try {
+                $this->auditLogService->log(
+                    action: 'invoice_receipt_mail_failed',
+                    targetType: 'invoice',
+                    targetId: $invoice->id,
+                    request: $request,
+                );
+            } catch (\Throwable $auditE) {
+                Log::error('Failed to create failure audit log for invoice receipt mail', [
+                    'invoice_id' => $invoice->id,
+                    'error'      => $auditE->getMessage(),
+                ]);
+            }
+
+            throw new \RuntimeException('領収書メール送信に失敗しました。');
         }
     }
 }

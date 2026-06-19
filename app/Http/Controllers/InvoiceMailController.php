@@ -29,4 +29,24 @@ class InvoiceMailController extends Controller
             ->route('invoices.show', $invoice)
             ->with('success', '請求書メールを送信しました。');
     }
+
+    /**
+     * Generate a receipt PDF and send it to the customer's email address.
+     */
+    public function sendReceipt(Invoice $invoice, Request $request)
+    {
+        abort_if($invoice->status !== 'paid', 403, '入金済みの請求書にのみ領収書を発行できます。');
+
+        try {
+            $this->service->sendReceipt($invoice, $request);
+        } catch (\RuntimeException $e) {
+            return redirect()
+                ->route('invoices.show', $invoice)
+                ->with('error', $e->getMessage());
+        }
+
+        return redirect()
+            ->route('invoices.show', $invoice)
+            ->with('success', '領収書メールを送信しました。');
+    }
 }

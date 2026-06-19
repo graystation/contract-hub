@@ -57,6 +57,50 @@ class InvoiceFileService
     }
 
     /**
+     * Generate a receipt PDF, persist it to storage, and record the file.
+     */
+    public function generateAndStoreReceipt(Invoice $invoice, Request $request): InvoiceFile
+    {
+        $invoice->loadMissing('project.company', 'payments');
+
+        $pdfContent = Pdf::loadView('invoices.receipt-pdf', compact('invoice'))
+            ->setPaper('a4', 'portrait')
+            ->output();
+
+        $fileName = 'REC_' . $invoice->invoice_number . '_' . now()->format('YmdHis') . '.pdf';
+
+        Storage::disk('invoices')->put($fileName, $pdfContent);
+
+        $invoiceFile = InvoiceFile::create([
+            'invoice_id' => $invoice->id,
+            'file_name'  => $fileName,
+            'file_path'  => $fileName,
+            'file_type'  => 'receipt',
+            'file_hash'  => hash('sha256', $pdfContent),
+        ]);
+
+        $this->auditLogService->log(
+            action: 'invoice_receipt_generated',
+            targetType: 'invoice',
+            targetId: $invoice->id,
+            request: $request,
+        );
+
+        return $invoiceFile;
+    }
+
+    /**
+     * Return the most recently generated receipt for the given invoice, or null.
+     */
+    public function getLatestReceipt(Invoice $invoice): ?InvoiceFile
+    {
+        return $invoice->files()
+            ->where('file_type', 'receipt')
+            ->latest()
+            ->first();
+    }
+
+    /**
      * Generate a PDF for preview without persisting it to storage.
      */
     public function preview(Invoice $invoice): string
