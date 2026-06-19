@@ -206,12 +206,12 @@
             <table class="dl">
                 <tr>
                     <td class="label">会社名</td>
-                    <td class="value">{{ $invoice->project->company->company_name }}</td>
+                    <td class="value">{{ $invoice->project->company->company_name }}　御中</td>
                 </tr>
                 @if ($invoice->project->company->contact_name)
                     <tr>
                         <td class="label">担当者名</td>
-                        <td class="value">{{ $invoice->project->company->contact_name }}</td>
+                        <td class="value">{{ $invoice->project->company->contact_name }}　様</td>
                     </tr>
                 @endif
                 @if ($invoice->project->company->email)
