@@ -132,6 +132,17 @@
         .badge-paid      { background: #d1fae5; color: #065f46; }
         .badge-cancelled { background: #fee2e2; color: #991b1b; }
 
+        /* ---- Subject line ---- */
+        .subject-line {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1a1a2e;
+            border-bottom: 1pt solid #1a1a2e;
+            padding-bottom: 4pt;
+            margin-bottom: 7mm;
+        }
+        .subject-label { color: #666; font-weight: normal; }
+
         /* ---- Notes ---- */
         .notes-box {
             background: #fafafa;
@@ -214,18 +225,6 @@
                         <td class="value">{{ $invoice->project->company->contact_name }}　様</td>
                     </tr>
                 @endif
-                @if ($invoice->project->company->email)
-                    <tr>
-                        <td class="label">メールアドレス</td>
-                        <td class="value">{{ $invoice->project->company->email }}</td>
-                    </tr>
-                @endif
-                @if ($invoice->project->company->phone)
-                    <tr>
-                        <td class="label">電話番号</td>
-                        <td class="value">{{ $invoice->project->company->phone }}</td>
-                    </tr>
-                @endif
                 @if ($invoice->project->company->address)
                     <tr>
                         <td class="label">住所</td>
@@ -235,32 +234,9 @@
             </table>
         </div>
 
-        {{-- Project info --}}
-        <div class="section">
-            <div class="section-title">案件情報</div>
-            <table class="dl">
-                @php
-                    $typeLabels = ['advertisement' => '広告掲載', 'consulting' => 'コンサルティング', 'other' => 'その他'];
-                @endphp
-                <tr>
-                    <td class="label">案件名</td>
-                    <td class="value">{{ $invoice->project->title }}</td>
-                </tr>
-                <tr>
-                    <td class="label">種別</td>
-                    <td class="value">{{ $typeLabels[$invoice->project->type] ?? $invoice->project->type }}</td>
-                </tr>
-                @if ($invoice->project->description)
-                    <tr>
-                        <td class="label">案件説明</td>
-                        <td class="value">{{ $invoice->project->description }}</td>
-                    </tr>
-                @endif
-                <tr>
-                    <td class="label">請求タイトル</td>
-                    <td class="value">{{ $invoice->title }}</td>
-                </tr>
-            </table>
+        {{-- Subject --}}
+        <div class="subject-line">
+            <span class="subject-label">件名：</span>{{ $invoice->title }}
         </div>
 
         {{-- Amount breakdown --}}
