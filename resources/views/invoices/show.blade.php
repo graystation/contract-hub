@@ -198,10 +198,62 @@ $auditActionLabels = [
                 </div>
             </div>
 
-            {{-- Section 4: Latest invoice PDF --}}
+            {{-- Section 4: Mail send --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
+                {{ $invoice->project->company->email ? 'border-violet-500' : 'border-gray-300' }}">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 請求書メール送信</h3>
+                </div>
+                <div class="p-6">
+                    @if (! $invoice->project->company->email)
+                        <div class="px-3 py-2 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded text-sm">
+                            ⚠ 顧客のメールアドレスが未登録のため送信できません。
+                            <a href="{{ route('companies.edit', $invoice->project->company) }}"
+                               class="ml-2 text-yellow-900 underline hover:no-underline">顧客情報を更新</a>
+                        </div>
+                    @elseif ($invoice->status === 'cancelled')
+                        <p class="text-sm text-gray-500">キャンセル済みの請求書にはメール送信できません。</p>
+                    @else
+                        <div class="space-y-4">
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">送信先</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 flex items-center gap-2">
+                                        {{ $invoice->project->company->email }}
+                                        <a href="{{ route('companies.edit', $invoice->project->company) }}"
+                                           class="text-xs text-indigo-600 hover:text-indigo-800">変更 →</a>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">添付PDF</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        @if ($latestPdf)
+                                            <span class="text-green-700">{{ $latestPdf->file_name }}</span>
+                                        @else
+                                            <span class="text-orange-600">
+                                                PDFが未生成のため、送信時に自動生成します。
+                                            </span>
+                                        @endif
+                                    </dd>
+                                </div>
+                            </dl>
+                            <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}"
+                                  class="pt-3 border-t border-gray-100">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
+                                    請求書メールを送信する
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Section 5: Latest invoice PDF --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の請求書PDF</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">5. 最新の請求書PDF</h3>
                 </div>
 
                 @if ($latestPdf)
@@ -234,11 +286,11 @@ $auditActionLabels = [
                 @endif
             </div>
 
-            {{-- Section 5: All invoice files --}}
+            {{-- Section 6: All invoice files --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                        5. 請求書ファイル一覧
+                        6. 請求書ファイル一覧
                         <span class="ml-2 text-gray-400 font-normal normal-case">{{ $invoice->files->count() }} 件</span>
                     </h3>
                     @unless (in_array($invoice->status, ['paid', 'cancelled'], true))
@@ -292,58 +344,6 @@ $auditActionLabels = [
                     </table>
                     </div>{{-- overflow-x-auto --}}
                 @endif
-            </div>
-
-            {{-- Section 6: Mail send --}}
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
-                {{ $invoice->project->company->email ? 'border-violet-500' : 'border-gray-300' }}">
-                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">6. 請求書メール送信</h3>
-                </div>
-                <div class="p-6">
-                    @if (! $invoice->project->company->email)
-                        <div class="px-3 py-2 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded text-sm">
-                            ⚠ 顧客のメールアドレスが未登録のため送信できません。
-                            <a href="{{ route('companies.edit', $invoice->project->company) }}"
-                               class="ml-2 text-yellow-900 underline hover:no-underline">顧客情報を更新</a>
-                        </div>
-                    @elseif ($invoice->status === 'cancelled')
-                        <p class="text-sm text-gray-500">キャンセル済みの請求書にはメール送信できません。</p>
-                    @else
-                        <div class="space-y-4">
-                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">送信先</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 flex items-center gap-2">
-                                        {{ $invoice->project->company->email }}
-                                        <a href="{{ route('companies.edit', $invoice->project->company) }}"
-                                           class="text-xs text-indigo-600 hover:text-indigo-800">変更 →</a>
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">添付PDF</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">
-                                        @if ($latestPdf)
-                                            <span class="text-green-700">{{ $latestPdf->file_name }}</span>
-                                        @else
-                                            <span class="text-orange-600">
-                                                PDFが未生成のため、送信時に自動生成します。
-                                            </span>
-                                        @endif
-                                    </dd>
-                                </div>
-                            </dl>
-                            <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}"
-                                  class="pt-3 border-t border-gray-100">
-                                @csrf
-                                <button type="submit"
-                                        class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
-                                    請求書メールを送信する
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-                </div>
             </div>
 
             {{-- Section 7: Receipt --}}
