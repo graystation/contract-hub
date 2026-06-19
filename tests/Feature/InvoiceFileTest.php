@@ -22,7 +22,7 @@ class InvoiceFileTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    /** Invoice show page renders the PDF generate button. */
+    /** Invoice show page renders the PDF preview link and regenerate button. */
     public function test_invoice_show_has_pdf_generate_button(): void
     {
         $invoice = Invoice::factory()->create();
@@ -31,7 +31,8 @@ class InvoiceFileTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('invoices.show', $invoice))
             ->assertOk()
-            ->assertSee('PDF生成');
+            ->assertSee('PDFプレビュー')
+            ->assertSee('PDFを生成');
     }
 
     /** Posting to the generate endpoint succeeds and redirects. */

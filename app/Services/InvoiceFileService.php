@@ -57,6 +57,16 @@ class InvoiceFileService
     }
 
     /**
+     * Generate a PDF for preview without persisting it to storage.
+     */
+    public function preview(Invoice $invoice): string
+    {
+        $invoice->loadMissing('project.company', 'payments');
+
+        return $this->generatePdfContent($invoice);
+    }
+
+    /**
      * Render the invoice Blade template through dompdf and return the raw PDF bytes.
      */
     private function generatePdfContent(Invoice $invoice): string

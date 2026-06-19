@@ -31,23 +31,11 @@ $auditActionLabels = [
                 </h2>
             </div>
             <div class="flex items-center space-x-2">
-                @if ($invoice->project->company->email && $invoice->status !== 'cancelled')
-                    <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}">
-                        @csrf
-                        <button type="submit"
-                                class="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700">
-                            メール送信
-                        </button>
-                    </form>
-                @endif
+                <a href="{{ route('invoices.pdf.preview', $invoice) }}" target="_blank"
+                   class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
+                    PDFプレビュー
+                </a>
                 @unless (in_array($invoice->status, ['paid', 'cancelled'], true))
-                    <form method="POST" action="{{ route('invoices.pdf.store', $invoice) }}">
-                        @csrf
-                        <button type="submit"
-                                class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
-                            PDF生成
-                        </button>
-                    </form>
                     <a href="{{ route('invoices.edit', $invoice) }}"
                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
                         編集
@@ -226,7 +214,7 @@ $auditActionLabels = [
                     </div>
                 @else
                     <div class="px-6 py-8 text-center text-sm text-gray-400">
-                        請求書PDFが生成されていません。「PDF生成」ボタンから作成してください。
+                        請求書PDFはまだ生成されていません。「請求書を送信」で自動生成されます。
                     </div>
                 @endif
             </div>

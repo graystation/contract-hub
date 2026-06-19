@@ -31,6 +31,19 @@ class InvoiceFileController extends Controller
     }
 
     /**
+     * Stream a preview PDF inline without saving.
+     */
+    public function preview(Invoice $invoice)
+    {
+        $pdfContent = $this->service->preview($invoice);
+
+        return response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="preview.pdf"',
+        ]);
+    }
+
+    /**
      * Stream the stored invoice PDF as a download.
      */
     public function download(Invoice $invoice, InvoiceFile $invoiceFile)
