@@ -23,7 +23,8 @@ class InvoiceRequest extends FormRequest
             'issued_at'  => ['nullable', 'date'],
             'due_date'   => ['nullable', 'date', 'after_or_equal:issued_at'],
             'status'     => ['required', Rule::in(Invoice::STATUSES)],
-            'notes'      => ['nullable', 'string'],
+            'notes'               => ['nullable', 'string'],
+            'receipt_description' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

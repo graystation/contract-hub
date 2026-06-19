@@ -111,4 +111,13 @@ $selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?
         @error('notes') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
 
+    <div>
+        <label class="block text-sm font-medium text-gray-700">領収書但し書き</label>
+        <input type="text" name="receipt_description"
+               value="{{ old('receipt_description', $invoice->receipt_description ?? '') }}"
+               placeholder="例：HP広告掲載費　（空欄の場合はタイトルを使用）"
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm @error('receipt_description') border-red-500 @enderror">
+        @error('receipt_description') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+    </div>
+
 </div>

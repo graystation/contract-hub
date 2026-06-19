@@ -205,7 +205,7 @@
 
         {{-- Receipt statement --}}
         <div class="receipt-statement">
-            <div class="tadashi">但し　{{ $invoice->title }}　として</div>
+            <div class="tadashi">但し　{{ $invoice->receipt_description ?: $invoice->title }}　として</div>
             <div class="ryoushu">上記の金額を正に領収いたしました。</div>
         </div>
 

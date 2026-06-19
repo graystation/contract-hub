@@ -23,6 +23,7 @@ class Invoice extends Model
         'due_date',
         'status',
         'notes',
+        'receipt_description',
     ];
 
     protected $casts = [
