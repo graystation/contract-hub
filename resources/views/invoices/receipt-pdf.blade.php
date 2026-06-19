@@ -129,6 +129,19 @@
         .footer .f-left  { text-align: left; }
         .footer .f-right { text-align: right; }
         .page-num:before { content: "- " counter(page) " -"; }
+        .receipt-statement {
+            margin-bottom: 8mm;
+            padding: 6pt 10pt;
+            background: #fafafa;
+            border: 0.5pt solid #e0e0e0;
+        }
+        .tadashi   { font-size: 10pt; color: #444; margin-bottom: 4pt; }
+        .ryoushu   { font-size: 11pt; font-weight: bold; color: #1a1a2e; }
+
+        .issuer-block  { text-align: right; margin-top: 8mm; }
+        .issuer-name   { font-size: 11pt; font-weight: bold; color: #1a1a2e; }
+        .issuer-person { font-size: 10pt; color: #444; margin-top: 2pt; }
+
         .generated-at {
             font-size: 7.5pt;
             color: #bbb;
@@ -190,38 +203,16 @@
             </div>
         </div>
 
-        {{-- Details --}}
-        <div class="section">
-            <div class="section-title">件名・内容</div>
-            <table class="dl">
-                <tr>
-                    <td class="label">件名</td>
-                    <td class="value">{{ $invoice->title }}</td>
-                </tr>
-                <tr>
-                    <td class="label">案件名</td>
-                    <td class="value">{{ $invoice->project->title }}</td>
-                </tr>
-            </table>
+        {{-- Receipt statement --}}
+        <div class="receipt-statement">
+            <div class="tadashi">但し　{{ $invoice->title }}　として</div>
+            <div class="ryoushu">上記の金額を正に領収いたしました。</div>
         </div>
 
         {{-- Issuer --}}
-        <div class="section">
-            <div class="section-title">発行者</div>
-            <table class="dl">
-                <tr>
-                    <td class="label">会社名</td>
-                    <td class="value">{{ config('app.operator_company') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">担当者</td>
-                    <td class="value">{{ config('app.operator_name') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">住所</td>
-                    <td class="value">{{ config('app.operator_address') }}</td>
-                </tr>
-            </table>
+        <div class="issuer-block">
+            <div class="issuer-name">{{ config('app.operator_company') }}</div>
+            <div class="issuer-person">{{ config('app.operator_name') }}</div>
         </div>
 
         <div class="generated-at">発行日時：{{ now()->format('Y年m月d日 H:i') }}</div>
