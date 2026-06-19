@@ -88,19 +88,9 @@
                                         <span class="text-gray-400">—</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    @unless (in_array($invoice->status, ['paid', 'cancelled'], true))
-                                        <a href="{{ route('invoices.edit', $invoice) }}"
-                                           class="text-indigo-600 hover:text-indigo-900">編集</a>
-                                    @endunless
-                                    @unless (in_array($invoice->status, ['paid', 'cancelled'], true) || $invoice->payments->isNotEmpty())
-                                        <form method="POST" action="{{ route('invoices.destroy', $invoice) }}"
-                                              class="inline"
-                                              onsubmit="return confirm('「{{ $invoice->invoice_number }}」を削除してよろしいですか？')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">削除</button>
-                                        </form>
-                                    @endunless
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="{{ route('invoices.show', $invoice) }}"
+                                       class="text-indigo-600 hover:text-indigo-900">詳細 →</a>
                                 </td>
                             </tr>
                         @empty
