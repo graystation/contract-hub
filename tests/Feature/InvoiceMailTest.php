@@ -73,7 +73,7 @@ class InvoiceMailTest extends TestCase
         Mail::assertSent(InvoiceSendMail::class);
     }
 
-    /** When a PDF already exists, no new file is generated. */
+    /** When a PDF already exists, a new one is always generated on send. */
     public function test_existing_pdf_is_reused_not_regenerated(): void
     {
         $invoice = $this->invoiceWithEmail();
@@ -82,7 +82,7 @@ class InvoiceMailTest extends TestCase
         $this->actingAs($this->user)
             ->post(route('invoices.mail.send', $invoice));
 
-        $this->assertSame(1, InvoiceFile::where('invoice_id', $invoice->id)->count());
+        $this->assertSame(2, InvoiceFile::where('invoice_id', $invoice->id)->count());
         Mail::assertSent(InvoiceSendMail::class);
     }
 

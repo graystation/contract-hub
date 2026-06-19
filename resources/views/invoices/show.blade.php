@@ -226,15 +226,7 @@ $auditActionLabels = [
                                 </div>
                                 <div>
                                     <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">添付PDF</dt>
-                                    <dd class="mt-1 text-sm text-gray-900">
-                                        @if ($latestPdf)
-                                            <span class="text-green-700">{{ $latestPdf->file_name }}</span>
-                                        @else
-                                            <span class="text-orange-600">
-                                                PDFが未生成のため、送信時に自動生成します。
-                                            </span>
-                                        @endif
-                                    </dd>
+                                    <dd class="mt-1 text-sm text-gray-500">送信時に最新内容で自動生成します。</dd>
                                 </div>
                             </dl>
                             <form method="POST" action="{{ route('invoices.mail.send', $invoice) }}"

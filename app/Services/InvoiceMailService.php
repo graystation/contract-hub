@@ -30,11 +30,8 @@ class InvoiceMailService
             throw new \RuntimeException('送信先メールアドレスが登録されていません。');
         }
 
-        // Auto-generate PDF if no file exists yet
-        $invoiceFile = $this->fileService->getLatestPdf($invoice);
-        if (! $invoiceFile) {
-            $invoiceFile = $this->fileService->generateAndStore($invoice, $request);
-        }
+        // Always regenerate PDF to ensure latest content is attached
+        $invoiceFile = $this->fileService->generateAndStore($invoice, $request);
 
         try {
             Mail::to($invoice->project->company->email)
