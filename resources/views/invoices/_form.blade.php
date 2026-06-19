@@ -4,7 +4,20 @@ $selectedProjectId = old('project_id', $invoice->project_id ?? $fromContract?->p
 $selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?->id ?? '');
 @endphp
 
-<div x-data="{ amount: {{ old('amount', $invoice->amount ?? 0) }}, selectedProjectId: '{{ $selectedProjectId }}' }" class="space-y-5">
+<div x-data="{
+    amount: {{ old('amount', $invoice->amount ?? 0) }},
+    displayAmount: '',
+    selectedProjectId: '{{ $selectedProjectId }}',
+    init() {
+        this.displayAmount = this.amount > 0 ? this.amount.toLocaleString() : '';
+    },
+    onAmountInput(e) {
+        const raw = e.target.value.replace(/[^\d]/g, '');
+        this.amount = raw === '' ? 0 : parseInt(raw, 10);
+        this.displayAmount = raw === '' ? '' : this.amount.toLocaleString();
+        e.target.value = this.displayAmount;
+    }
+}" class="space-y-5">
 
     <div>
         <label class="block text-sm font-medium text-gray-700">案件 <span class="text-red-500">*</span></label>
@@ -45,8 +58,9 @@ $selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?
 
     <div>
         <label class="block text-sm font-medium text-gray-700">税抜金額（円） <span class="text-red-500">*</span></label>
-        <input type="number" name="amount" x-model="amount" min="0"
+        <input type="text" inputmode="numeric" x-model="displayAmount" @input="onAmountInput($event)"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm @error('amount') border-red-500 @enderror">
+        <input type="hidden" name="amount" :value="amount">
         @error('amount') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         <div class="mt-2 p-3 bg-gray-50 rounded-md text-sm text-gray-600 space-y-1">
             <div class="flex justify-between">
