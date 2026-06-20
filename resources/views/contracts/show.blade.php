@@ -205,55 +205,11 @@ $actionLabels = [
                 </div>
             </div>
 
-            {{-- Section 3: Latest PDF --}}
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
-                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の契約PDF</h3>
-                </div>
-
-                @if ($latestPdf)
-                    <div class="p-6">
-                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mb-4">
-                            <div>
-                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">ファイル名</dt>
-                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $latestPdf->file_name }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">生成日時</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $latestPdf->created_at->format('Y/m/d H:i') }}</dd>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">SHA256</dt>
-                                <dd class="mt-1 text-xs text-gray-500 font-mono break-all">{{ $latestPdf->file_hash ?? '—' }}</dd>
-                            </div>
-                        </dl>
-                        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
-                            <a href="{{ route('contracts.files.download', [$contract, $latestPdf]) }}"
-                               class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
-                                ダウンロード
-                            </a>
-                            <form method="POST"
-                                  action="{{ route('contracts.files.verify-hash', [$contract, $latestPdf]) }}">
-                                @csrf
-                                <button type="submit"
-                                        class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
-                                    ハッシュ検証
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    <div class="px-6 py-8 text-center text-sm text-gray-400">
-                        PDFはまだ生成されていません。同意完了後に自動生成されます。
-                    </div>
-                @endif
-            </div>
-
-            {{-- Section 4: Electronic consent --}}
+            {{-- Section 3: Electronic consent --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
                 {{ $contract->status === 'signed' ? 'border-green-500' : ($contract->sign_token ? 'border-violet-500' : 'border-gray-300') }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">5. 電子同意</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 電子同意</h3>
                 </div>
                 <div class="p-6">
 
@@ -384,6 +340,50 @@ $actionLabels = [
                     @endif
 
                 </div>
+            </div>
+
+            {{-- Section 4: Latest PDF --}}
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の契約PDF</h3>
+                </div>
+
+                @if ($latestPdf)
+                    <div class="p-6">
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mb-4">
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">ファイル名</dt>
+                                <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $latestPdf->file_name }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">生成日時</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $latestPdf->created_at->format('Y/m/d H:i') }}</dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs font-medium text-gray-500 uppercase tracking-wide">SHA256</dt>
+                                <dd class="mt-1 text-xs text-gray-500 font-mono break-all">{{ $latestPdf->file_hash ?? '—' }}</dd>
+                            </div>
+                        </dl>
+                        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                            <a href="{{ route('contracts.files.download', [$contract, $latestPdf]) }}"
+                               class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                                ダウンロード
+                            </a>
+                            <form method="POST"
+                                  action="{{ route('contracts.files.verify-hash', [$contract, $latestPdf]) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50">
+                                    ハッシュ検証
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <div class="px-6 py-8 text-center text-sm text-gray-400">
+                        PDFはまだ生成されていません。同意完了後に自動生成されます。
+                    </div>
+                @endif
             </div>
 
             {{-- Section 5: All contract files --}}
