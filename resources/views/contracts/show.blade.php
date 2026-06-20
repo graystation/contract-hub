@@ -209,7 +209,7 @@ $actionLabels = [
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4
                 {{ $contract->status === 'signed' ? 'border-green-500' : ($contract->sign_token ? 'border-violet-500' : 'border-gray-300') }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">3. 電子同意</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 電子同意</h3>
                 </div>
                 <div class="p-6">
 
@@ -345,7 +345,7 @@ $actionLabels = [
             {{-- Section 4: Latest PDF --}}
             <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden border-l-4 {{ $latestPdf ? 'border-emerald-500' : 'border-gray-300' }}">
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">4. 最新の契約PDF</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">5. 最新の契約PDF</h3>
                 </div>
 
                 @if ($latestPdf)
