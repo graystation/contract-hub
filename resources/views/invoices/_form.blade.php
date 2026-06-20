@@ -50,8 +50,8 @@ $selectedContractId = old('contract_id', $invoice->contract_id ?? $fromContract?
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-gray-700">タイトル <span class="text-red-500">*</span></label>
-        <input type="text" name="title" value="{{ old('title', $invoice->title ?? '') }}"
+        <label class="block text-sm font-medium text-gray-700">件名 <span class="text-red-500">*</span></label>
+        <input type="text" name="title" value="{{ old('title', $invoice->title ?? $defaultTitle ?? '') }}"
                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm @error('title') border-red-500 @enderror">
         @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
     </div>

@@ -36,12 +36,21 @@ class InvoiceController extends Controller
             ? Contract::with('project.company')->find($request->contract_id)
             : null;
 
+        $fromProject = ! $fromContract && $request->project_id
+            ? Project::find($request->project_id)
+            : null;
+
+        $defaultTitle = $fromContract?->project->title
+            ?? $fromProject?->title
+            ?? '';
+
         return view('invoices.create', [
             'projects'      => Project::with('company')->orderByDesc('created_at')->get(),
             'contracts'     => Contract::with('project.company')->orderByDesc('created_at')->get(),
             'statuses'      => Invoice::STATUSES,
             'invoiceNumber' => $this->service->generateInvoiceNumber(),
             'fromContract'  => $fromContract,
+            'defaultTitle'  => $defaultTitle,
         ]);
     }
 
