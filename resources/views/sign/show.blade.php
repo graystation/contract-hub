@@ -99,7 +99,7 @@
                         <div class="space-y-5">
                             <div>
                                 <label for="signer_name" class="block text-sm font-medium text-gray-700">
-                                    お名前 <span class="text-red-500">*</span>
+                                    契約書記載氏名 <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text"
                                        id="signer_name"
@@ -107,6 +107,19 @@
                                        value="{{ old('signer_name') }}"
                                        placeholder="山田 太郎"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_name') border-red-500 @enderror">
+                                <p class="mt-1 text-xs text-gray-400">契約書PDFに記載されるお名前です。</p>
+                            </div>
+
+                            <div>
+                                <label for="signer_address" class="block text-sm font-medium text-gray-700">
+                                    住所 <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       id="signer_address"
+                                       name="signer_address"
+                                       value="{{ old('signer_address') }}"
+                                       placeholder="東京都千代田区〇〇1-2-3"
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_address') border-red-500 @enderror">
                             </div>
 
                             <div>
@@ -116,7 +129,7 @@
                                 <input type="email"
                                        id="signer_email"
                                        name="signer_email"
-                                       value="{{ old('signer_email') }}"
+                                       value="{{ old('signer_email', $contract->project->company->email ?? '') }}"
                                        placeholder="example@example.com"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_email') border-red-500 @enderror">
                                 <p class="mt-1 text-xs text-gray-400">
@@ -131,21 +144,9 @@
                                 <input type="email"
                                        id="signer_email_confirmation"
                                        name="signer_email_confirmation"
-                                       value="{{ old('signer_email_confirmation') }}"
+                                       value="{{ old('signer_email_confirmation', $contract->project->company->email ?? '') }}"
                                        placeholder="example@example.com"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_email_confirmation') border-red-500 @enderror">
-                            </div>
-
-                            <div>
-                                <label for="signer_address" class="block text-sm font-medium text-gray-700">
-                                    住所 <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text"
-                                       id="signer_address"
-                                       name="signer_address"
-                                       value="{{ old('signer_address') }}"
-                                       placeholder="東京都千代田区〇〇1-2-3"
-                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500 @error('signer_address') border-red-500 @enderror">
                             </div>
 
                             <div class="pt-2 border-t border-gray-100">
